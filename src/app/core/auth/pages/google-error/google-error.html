@@ -1,0 +1,64 @@
+<div class="page-wrapper relative flex min-h-screen items-center justify-center overflow-hidden bg-[#F4F7F9] px-4 py-10">
+
+  <app-wave-background />
+
+  <main class="error-card relative z-10 w-full max-w-[460px] rounded-[24px] bg-white p-7 text-center shadow-[0_10px_40px_rgba(0,0,0,0.06)] sm:p-10">
+
+    <img src="logo.png" alt="CloseIA" class="mx-auto mb-6 h-10 w-auto object-contain" />
+
+    <!-- Icône -->
+    <div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full ring-8" [class]="toneClasses()">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        @for (d of iconPaths(); track d) {
+          <path [attr.d]="d" />
+        }
+      </svg>
+    </div>
+
+    <!-- Titre et explication -->
+    <h1 #heading tabindex="-1" class="text-[22px] leading-tight font-extrabold tracking-[-0.4px] text-[#2C3E50] outline-none sm:text-[24px]">
+      {{ info().title }}
+    </h1>
+    <p role="alert" class="mt-2.5 text-[14.5px] leading-relaxed text-[#6B7C8F]">
+      {{ info().message }}
+    </p>
+
+    @if (email(); as mail) {
+      <p class="mx-auto mt-4 inline-flex max-w-full items-center gap-2 rounded-full border border-[#D8E4EE] bg-[#FAFCFE] px-4 py-2 text-[13px] text-[#2C3E50]">
+        <span class="shrink-0 text-[#9AAAB9]">Compte utilisé</span>
+        <strong class="truncate font-semibold">{{ mail }}</strong>
+      </p>
+    }
+
+    <!-- Étapes -->
+    <section class="mt-6 rounded-2xl bg-[#F4F8FB] p-5 text-left" aria-labelledby="steps-title">
+      <h2 id="steps-title" class="mb-3 text-[12.5px] font-semibold tracking-[0.08em] text-[#6B7C8F] uppercase">Que faire ?</h2>
+      <ol class="space-y-3">
+        @for (step of info().steps; track $index) {
+          <li class="flex gap-3 text-[14px] leading-snug text-[#2C3E50]">
+            <span class="mt-px grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#6CB4E0] text-[11px] font-bold text-white">{{ $index + 1 }}</span>
+            <span>{{ step }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <!-- Actions -->
+    <div class="mt-7 flex flex-col gap-3">
+      <a routerLink="/login" class="btn-primary flex items-center justify-center gap-2 rounded-full bg-[#6CB4E0] px-6 py-4 text-[15px] font-semibold text-white no-underline">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Retour à la connexion
+      </a>
+
+      @if (info().contactAdmin) {
+        <a [href]="mailto()" class="btn-google flex items-center justify-center gap-2 rounded-full border border-[#D8E4EE] bg-white px-6 py-3.5 text-[15px] font-medium text-[#2C3E50] no-underline">
+          Contacter l’administrateur
+        </a>
+      }
+    </div>
+
+    <p class="mt-5 text-[11.5px] text-[#9AAAB9]">
+      Référence : <code class="font-mono">{{ errorCode() }}</code>
+    </p>
+  </main>
+</div>

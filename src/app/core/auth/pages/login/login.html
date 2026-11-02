@@ -1,0 +1,187 @@
+<div class="page-wrapper relative min-h-screen overflow-hidden bg-[#F4F7F9] flex items-center justify-center px-6 py-10 gap-10 max-[900px]:flex-col max-[900px]:gap-8 max-[900px]:pt-10 max-[900px]:px-4">
+
+    <!-- ===== VAGUES DÉCORATIVES AUX COINS ===== -->
+    <svg class="wave-corner wave-corner--top-left pointer-events-none absolute -top-1 -left-1 z-0 w-[130px] h-[130px]" viewBox="0 0 130 130" fill="none" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 0 H130 C95 12, 82 28, 70 48 C55 72, 40 95, 0 130 Z" fill="#8CB8D9" opacity="0.85"/>
+    <path d="M0 0 H95 C70 10, 58 24, 48 42 C36 62, 22 80, 0 100 Z" fill="#A3CBE8" opacity="0.55"/>
+  </svg>
+    <svg class="wave-corner wave-corner--top-right pointer-events-none absolute -top-1 -right-1 z-0 w-[110px] h-[110px]" viewBox="0 0 110 110" fill="none" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M110 0 H0 C35 14, 48 30, 60 50 C72 72, 88 92, 110 110 Z" fill="#A8D0C4" opacity="0.85"/>
+    <path d="M110 0 H28 C52 12, 64 26, 74 44 C84 62, 96 78, 110 92 Z" fill="#9BD5CB" opacity="0.5"/>
+  </svg>
+    <svg class="wave-corner wave-corner--bottom-left pointer-events-none absolute -bottom-1 -left-1 z-0 w-[110px] h-[110px]" viewBox="0 0 110 110" fill="none" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 110 V0 C18 26, 32 44, 46 62 C60 80, 78 96, 110 110 Z" fill="#DBCBB3" opacity="0.85"/>
+    <path d="M0 110 V32 C14 52, 26 66, 40 80 C54 94, 72 104, 110 110 Z" fill="#E8DCC8" opacity="0.5"/>
+  </svg>
+    <svg class="wave-corner wave-corner--bottom-right pointer-events-none absolute -bottom-1 -right-1 z-0 w-[130px] h-[130px]" viewBox="0 0 130 130" fill="none" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M130 110 V0 C110 28, 96 46, 82 64 C68 82, 50 100, 0 110 Z" fill="#A3CBE8" opacity="0.85"/>
+    <path d="M130 110 V42 C114 62, 102 76, 88 90 C74 102, 56 108, 0 110 Z" fill="#B8D9F0" opacity="0.5"/>
+  </svg>
+
+    <!-- ===== BLOC GAUCHE : CARTE GLASSMORPHISM (desktop uniquement) ===== -->
+    <div class="left-panel relative z-10 w-full max-w-[400px] flex flex-col items-center text-center rounded-[28px] bg-white/45 backdrop-blur-xl border border-white/70 p-9 shadow-[0_10px_40px_rgba(0,0,0,0.06)] max-[900px]:hidden">
+
+        <div class="glass-halo" aria-hidden="true"></div>
+
+        <div class="logo-wrap relative z-10">
+            <img src="logo.png" alt="CloseIA" class="w-[88px] h-[88px] object-contain drop-shadow-[0_8px_20px_rgba(108,180,224,0.35)]" />
+        </div>
+
+        <h1 class="relative z-10 mt-4 text-[30px] font-extrabold tracking-[-0.6px] leading-none">
+            <span class="text-[#2C3E50]">Close</span><span class="text-[#6CB4E0]">IA</span>
+        </h1>
+
+        <p class="slogan relative z-10 mt-2 text-[12.5px] font-medium tracking-[0.18em] uppercase text-[#6B7C8F]/85">
+            Votre savoir, à portée de main
+        </p>
+
+        <div class="relative z-10 mt-5 mb-6 flex items-center gap-3 w-full max-w-[180px]">
+            <span class="flex-1 h-px bg-linear-to-r from-transparent to-[#6CB4E0]/60"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#6CB4E0]"></span>
+            <span class="flex-1 h-px bg-linear-to-l from-transparent to-[#6CB4E0]/60"></span>
+        </div>
+
+        <div class="relative z-10">
+            <h2 class="text-[26px] font-extrabold tracking-[-0.5px] text-[#2C3E50] mb-3">Bienvenue&nbsp;!</h2>
+            <p class="text-[14.5px] leading-relaxed text-[#6B7C8F]">
+                Connectez-vous pour accéder à votre espace et profiter de toutes les fonctionnalités de votre plateforme scolaire.
+            </p>
+        </div>
+    </div>
+
+
+    <div class="right-panel relative z-10 w-full max-w-[420px] rounded-[24px] bg-white p-10 shadow-[0_10px_40px_rgba(0,0,0,0.06)] max-[900px]:p-7 max-[900px]:px-5">
+
+
+        <div class="mobile-brand hidden max-[900px]:flex flex-col items-center text-center mb-7">
+            <div class="logo-wrap">
+                <img src="logo.png" alt="CloseIA" class="w-[100px] h-[100px] object-contain drop-shadow-[0_8px_22px_rgba(108,180,224,0.4)]" />
+            </div>
+            <h1 class="mt-3 text-[28px] font-extrabold tracking-[-0.5px] leading-none">
+                <span class="text-[#2C3E50]">Close</span><span class="text-[#6CB4E0]"> IA</span>
+            </h1>
+        </div>
+
+        @if (logoutMessage(); as m) {
+        <div role="status" class="alert-in mb-4 flex items-start gap-2.5 rounded-2xl border px-4 py-3 text-[13px] leading-snug" [class]="m.tone === 'danger'
+             ? 'border-[#F2C4C4] bg-[#FDF3F3] text-[#B42318]'
+             : 'border-[#C9DFF0] bg-[#F1F8FD] text-[#2C5F85]'">
+            <svg class="mt-0.5 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>{{ m.text }}</span>
+        </div>
+        }
+
+        <!-- Messages -->
+        @if (error()) {
+        <div role="alert" class="alert-in mb-4 flex items-start gap-2.5 rounded-2xl border border-[#F2C4C4] bg-[#FDF3F3] px-4 py-3 text-[13px] leading-snug text-[#B42318]">
+            <svg class="mt-0.5 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            <span>{{ error() }}</span>
+        </div>
+        } @if (info()) {
+        <div role="status" class="alert-in mb-4 flex items-start gap-2.5 rounded-2xl border border-[#C9DFF0] bg-[#F1F8FD] px-4 py-3 text-[13px] leading-snug text-[#2C5F85]">
+            <svg class="mt-0.5 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>{{ info() }}</span>
+        </div>
+        }
+
+        <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="onLogin()" novalidate>
+
+            <!-- Email -->
+            <div>
+                <div class="field-wrapper relative flex items-center rounded-full border border-[#D8E4EE] bg-[#FAFCFE] transition-all focus-within:border-[#6CB4E0] focus-within:shadow-[0_0_0_3px_rgba(108,180,224,0.15)]" [class.is-invalid]="emailInvalid()">
+                    <span class="flex items-center justify-center w-12 shrink-0 text-[#9AAAB9]" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </span>
+                    <label for="email" class="sr-only">Adresse e-mail</label>
+                    <input class="flex-1 border-none bg-transparent outline-none text-[14px] text-[#2C3E50] py-3.5 pr-3 font-[Inter,system-ui,sans-serif] placeholder:text-[#9AAAB9]" type="email" id="email" name="email" placeholder="prenom.nom@votre-etablissement.org" formControlName="email"
+                        autocomplete="username" [attr.aria-invalid]="emailInvalid()" required />
+                </div>
+                @if (emailInvalid()) {
+                <p class="mt-1.5 px-4 text-[12.5px] text-[#B42318]">Format attendu : prenom.nom@domaine-de-votre-établissement</p>
+                }
+            </div>
+
+            <!-- Mot de passe -->
+            <div>
+                <div class="field-wrapper relative flex items-center rounded-full border border-[#D8E4EE] bg-[#FAFCFE] transition-all focus-within:border-[#6CB4E0] focus-within:shadow-[0_0_0_3px_rgba(108,180,224,0.15)]" [class.is-invalid]="passwordInvalid()">
+                    <span class="flex items-center justify-center w-12 shrink-0 text-[#9AAAB9]" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </span>
+                    <label for="password" class="sr-only">Mot de passe</label>
+                    <input class="flex-1 border-none bg-transparent outline-none text-[14px] text-[#2C3E50] py-3.5 pr-3 font-[Inter,system-ui,sans-serif] placeholder:text-[#9AAAB9]" [type]="showPassword() ? 'text' : 'password'" id="password" name="password" placeholder="Mot de passe"
+                        formControlName="password" autocomplete="current-password" [attr.aria-invalid]="passwordInvalid()" required />
+                    <button type="button" class="flex items-center justify-center w-12 h-full bg-transparent border-none cursor-pointer text-[#9AAAB9] rounded-r-full transition-colors hover:text-[#6CB4E0]" (click)="togglePassword()" [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                        [attr.aria-pressed]="showPassword()">
+            @if (!showPassword()) {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            } @else {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.8 10.8 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            }
+          </button>
+                </div>
+                @if (passwordInvalid()) {
+                <p class="mt-1.5 px-4 text-[12.5px] text-[#B42318]">8 caractères minimum.</p>
+                }
+            </div>
+
+            <!-- Remember + Forgot -->
+            <div class="flex items-center justify-between mt-0.5 mb-2">
+                <label class="checkbox-custom relative flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" class="peer absolute opacity-0 w-0 h-0" name="rememberMe" formControlName="rememberMe" />
+          <span class="w-[18px] h-[18px] rounded flex items-center justify-center shrink-0 transition-colors border-[1.5px] peer-focus-visible:ring-2 peer-focus-visible:ring-[#6CB4E0]/40"
+                [class]="form.controls.rememberMe.value ? 'bg-[#6CB4E0] border-[#6CB4E0]' : 'border-[#D8E4EE]'">
+            @if (form.controls.rememberMe.value) {
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            }
+          </span>
+          <span class="text-[13px] text-[#6B7C8F]">Se souvenir de moi</span>
+        </label>
+                <button type="button" class="link-btn bg-transparent border-none cursor-pointer text-[13px] font-medium text-[#6CB4E0] p-0" (click)="onForgotPassword()">
+          Mot de passe oublié&nbsp;?
+        </button>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn-primary flex items-center justify-center gap-2 w-full rounded-full border-none bg-[#6CB4E0] text-white text-[15px] font-semibold py-4 px-6 cursor-pointer active:scale-[0.98] mt-1" [disabled]="loading() || googleLoading()">
+        @if (loading()) {
+          <svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.3"/><path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+          Connexion…
+        } @else {
+          Se connecter
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        }
+      </button>
+
+            <!-- Divider -->
+            <div class="flex items-center gap-3 my-1">
+                <span class="flex-1 h-px bg-[#EAEFF3]"></span>
+                <span class="text-[13px] text-[#9AAAB9] whitespace-nowrap">Ou</span>
+                <span class="flex-1 h-px bg-[#EAEFF3]"></span>
+            </div>
+
+            <!-- Google -->
+            <button type="button" class="btn-google flex items-center justify-center gap-2 w-full rounded-full border border-[#D8E4EE] bg-white text-[#2C3E50] text-[15px] font-medium py-3.5 px-6 cursor-pointer active:scale-[0.98]" (click)="onGoogleLogin()" [disabled]="loading() || googleLoading()">
+        @if (googleLoading()) {
+          <svg class="animate-spin text-[#6CB4E0]" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"/><path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+          Connexion à Google…
+        } @else {
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Se connecter avec Google
+        }
+      </button>
+        </form>
+
+        <p class="text-center text-[13px] text-[#6B7C8F] leading-relaxed mt-6">
+            Vous n'avez pas de compte&nbsp;?<br />
+            <button type="button" class="link-btn bg-transparent border-none cursor-pointer text-[13px] font-medium text-[#6CB4E0] p-0" (click)="onContact()">
+        Contactez votre établissement
+      </button>
+        </p>
+    </div>
+
+</div>

@@ -1,0 +1,21 @@
+<div class="shell min-h-dvh bg-canvas font-sans text-ink antialiased" [class.dark]="theme.isDark()">
+
+    <button type="button" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[70] focus:rounded-lg focus:border focus:border-line focus:bg-surface focus:px-4 focus:py-2 focus:text-sm focus:text-ink focus:shadow-lg" (click)="focusMain()">
+    {{ 'shell.skip' | transloco }}
+  </button>
+
+    <!-- Éléments fixes -->
+    <app-sidebar />
+    <app-header />
+
+    <!-- Contenu : la page entière défile, la barre latérale et l'en-tête restent en place -->
+    <div class="transition-[padding] duration-200" [class]="contentOffset()">
+        <main #main tabindex="-1" class="min-h-dvh px-4 pt-[96px] pb-10 outline-none sm:px-6 lg:px-8">
+            <div class="mx-auto w-full max-w-[1400px]">
+                <router-outlet />
+            </div>
+        </main>
+    </div>
+
+    <app-command-palette />
+</div>

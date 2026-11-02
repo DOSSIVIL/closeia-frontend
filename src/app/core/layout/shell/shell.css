@@ -1,0 +1,158 @@
+/* ============================================================
+   SHELL : barre latérale et en-tête fixes
+   ============================================================ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+@theme inline {
+    --color-canvas: var(--canvas);
+    --color-surface: var(--surface);
+    --color-raised: var(--raised);
+    --color-line: var(--line);
+    --color-ink: var(--ink);
+    --color-muted: var(--muted);
+    --color-brand: var(--brand);
+    --color-brand-soft: var(--brand-soft);
+    --color-brand-ink: var(--brand-ink);
+    --color-leaf: var(--leaf);
+    --color-leaf-ink: var(--leaf-ink);
+    --color-sand: var(--sand);
+    --color-sand-ink: var(--sand-ink);
+    --color-coral: var(--coral);
+    --color-nav: var(--nav);
+    --color-nav-ink: var(--nav-ink);
+    --color-nav-muted: var(--nav-muted);
+    --color-nav-active: var(--nav-active);
+}
+
+
+/* Mode clair */
+
+.shell {
+    color-scheme: light;
+    --canvas: #EEF2FB;
+    --surface: #FFFFFF;
+    --raised: #F3F6FD;
+    --line: #E2E8F5;
+    --ink: #0F1B3D;
+    --muted: #6B7A99;
+    --brand: #1D5FE0;
+    --brand-soft: color-mix(in oklab, #1D5FE0 10%, white);
+    --brand-ink: #1D5FE0;
+    --leaf: #22C55E;
+    --leaf-ink: #15803D;
+    --sand: #F59E0B;
+    --sand-ink: #B45309;
+    --coral: #EF4444;
+    /* Barre latérale : bleu nuit, identique dans les deux modes */
+    --nav: #0B1D51;
+    --nav-ink: #C4D2F4;
+    --nav-muted: #8EA3D6;
+    --nav-active: #1D5FE0;
+}
+
+
+/* Mode sombre */
+
+.shell.dark {
+    color-scheme: dark;
+    --canvas: #060C1F;
+    --surface: #0C1530;
+    --raised: #111C3D;
+    --line: #1B2A52;
+    --ink: #E8EDFB;
+    --muted: #8FA0C8;
+    --brand: #4D8DFF;
+    --brand-soft: color-mix(in oklab, #4D8DFF 16%, #0C1530);
+    --brand-ink: #8DB6FF;
+    --leaf-ink: #4ADE80;
+    --sand-ink: #FBBF24;
+    --nav: #08143F;
+}
+
+.shell :focus-visible:where(:not(input)) {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+.shell .nav-link:focus-visible {
+    outline-color: #fff;
+}
+
+
+/* Composants du shell. Dans « components », les classes Tailwind (utilities) gardent la priorité. */
+
+@layer components {
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.7rem 1rem;
+        border-radius: 0.875rem;
+        font-size: 14.5px;
+        font-weight: 500;
+        color: var(--nav-ink);
+        transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .nav-link:hover {
+        background-color: rgb(255 255 255 / 0.08);
+        color: #fff;
+    }
+    .nav-link.is-active,
+    .nav-link.is-active:hover {
+        background-color: var(--nav-active);
+        color: #fff;
+        box-shadow: 0 8px 20px -8px rgb(29 95 224 / 0.85);
+    }
+    .nav-link[aria-disabled='true'] {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+    .nav-link[aria-disabled='true']:hover {
+        background-color: transparent;
+        color: var(--nav-ink);
+    }
+    /* Barre latérale réduite : grand écran seulement (le tiroir mobile reste complet) */
+    @media (min-width: 1024px) {
+        .nav-link--compact {
+            justify-content: center;
+            padding-inline: 0;
+        }
+        .nav-label--hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
+        }
+    }
+    .icon-btn {
+        display: grid;
+        place-items: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 9999px;
+        color: var(--muted);
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .icon-btn:hover {
+        background-color: var(--raised);
+        color: var(--ink);
+    }
+}
+
+.pop-in {
+    animation: popIn 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    transform-origin: top right;
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}

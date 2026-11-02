@@ -1,159 +1,58 @@
-import { Component, computed, inject, signal, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { Auth } from '../../auth/auth';
+import { Component, ElementRef, computed, inject, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { filter } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import { Notifications } from '../../services/notifications';
 import { Theme } from '../../services/theme';
-
-interface NavItem {
-  label: string;
-  labelEn: string;
-  path: string;
-  icon: string;
-}
+import { CommandPalette } from '../command-palette/command-palette';
+import { Header } from '../header/header';
+import { ShellState } from '../shell-state';
+import { Sidebar } from '../sidebar/sidebar';
 
 @Component({
   selector: 'app-shell',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, FormsModule],
+  imports: [RouterOutlet, TranslocoPipe, Sidebar, Header, CommandPalette],
   templateUrl: './shell.html',
 })
 export class Shell {
-  auth = inject(Auth);
-  private router = inject(Router);
-  readonly theme = inject(Theme);
+  protected readonly theme = inject(Theme);
+  private readonly state = inject(ShellState);
+  private readonly router = inject(Router);
+  private readonly notifications = inject(Notifications);
+  private readonly transloco = inject(TranslocoService);
+  private readonly main = viewChild<ElementRef<HTMLElement>>('main');
 
-  collapsed = signal(false);
-  isMobileOpen = signal(false);
-  searchQuery = signal('');
-  isProfileMenuOpen = signal(false);
-  profileMenuSource = signal<'sidebar' | 'header'>('sidebar');
-  isNotificationsOpen = signal(false);
-  currentLang = signal<'FR' | 'EN'>(this.readLanguage());
-
-  readonly copy = computed(() => this.currentLang() === 'FR'
-    ? {
-        workspace: 'Espace de travail',
-        welcome: 'Bienvenue sur Close IA',
-        search: 'Rechercher une page…',
-        searchLabel: 'Rechercher dans la navigation',
-        profile: 'Mon profil',
-        connected: 'Connecté',
-        language: 'Langue',
-        logout: 'Déconnexion',
-        notifications: 'Notifications',
-        noNotifications: 'Tout est à jour',
-        noNotificationsHint: 'Vous n’avez aucune nouvelle notification.',
-        noResults: 'Aucune page trouvée',
-        themeLight: 'Activer le thème clair',
-        themeDark: 'Activer le thème sombre',
-      }
-    : {
-        workspace: 'Workspace',
-        welcome: 'Welcome to Close IA',
-        search: 'Search a page…',
-        searchLabel: 'Search navigation',
-        profile: 'My profile',
-        connected: 'Online',
-        language: 'Language',
-        logout: 'Sign out',
-        notifications: 'Notifications',
-        noNotifications: 'You’re all caught up',
-        noNotificationsHint: 'You have no new notifications.',
-        noResults: 'No pages found',
-        themeLight: 'Switch to light mode',
-        themeDark: 'Switch to dark mode',
-      });
-
-  readonly filteredNav = computed(() => {
-    const query = this.searchQuery().trim().toLocaleLowerCase();
-    return this.nav.filter((item) => {
-      const label = this.currentLang() === 'FR' ? item.label : item.labelEn;
-      return label.toLocaleLowerCase().includes(query);
-    });
-  });
-
-  nav: NavItem[] = [
-    { label: 'Tableau de bord', labelEn: 'Dashboard', path: '/dashboard', icon: 'home' },
-    { label: 'Écoles', labelEn: 'Schools', path: '/schools', icon: 'school' },
-    { label: 'Utilisateurs', labelEn: 'Users', path: '/users', icon: 'users' },
-    { label: 'Rôles', labelEn: 'Roles', path: '/roles', icon: 'shield' },
-    { label: 'Affectations', labelEn: 'Assignments', path: '/assignments', icon: 'link' },
-    { label: 'Documents', labelEn: 'Documents', path: '/documents', icon: 'document' },
-    { label: 'Conversations', labelEn: 'Conversations', path: '/conversations', icon: 'chat' },
-    { label: 'Audit', labelEn: 'Audit log', path: '/audit', icon: 'clipboard' },
-  ];
+  /** Le contenu laisse la place à la barre latérale fixe. */
+  protected readonly contentOffset = computed(() => (this.state.collapsed() ? 'lg:pl-[84px]' : 'lg:pl-[264px]'));
 
   constructor() {
-    if (this.router.url === '/' || this.router.url === '') {
-      this.router.navigate(['/dashboard']);
-    }
+    // Chaque navigation referme le tiroir mobile et les menus déroulants
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        this.state.closeDrawer();
+        this.state.closeMenus();
+      });
+
+    
+    if (!environment.production && this.notifications.items().length === 0) this.seedDemoNotifications();
   }
 
-  toggleCollapse(): void {
-    this.collapsed.update(v => !v);
+  
+  protected focusMain(): void {
+    this.main()?.nativeElement.focus();
   }
 
-  openMobile(): void {
-    this.isMobileOpen.set(true);
-  }
-
-  closeMobile(): void {
-    this.isMobileOpen.set(false);
-  }
-
-  toggleProfileMenu(source: 'sidebar' | 'header' = 'sidebar'): void {
-    if (this.isProfileMenuOpen() && this.profileMenuSource() === source) {
-      this.isProfileMenuOpen.set(false);
-      return;
-    }
-    this.profileMenuSource.set(source);
-    this.isProfileMenuOpen.set(true);
-    this.isNotificationsOpen.set(false);
-  }
-
-  toggleNotifications(): void {
-    this.isNotificationsOpen.update((open) => !open);
-    this.isProfileMenuOpen.set(false);
-  }
-
-  toggleDarkMode(): void {
-    this.theme.toggle();
-  }
-
-  setLanguage(language: 'FR' | 'EN'): void {
-    this.currentLang.set(language);
-    this.searchQuery.set('');
-    try {
-      localStorage.setItem('spacehub.language', language);
-    } catch {
-      // La préférence reste active pour cette session si le stockage est indisponible.
-    }
-  }
-
-  labelFor(item: NavItem): string {
-    return this.currentLang() === 'FR' ? item.label : item.labelEn;
-  }
-
-  @HostListener('document:keydown.escape')
-  closeMenus(): void {
-    this.isProfileMenuOpen.set(false);
-    this.isNotificationsOpen.set(false);
-    this.closeMobile();
-  }
-
-  @HostListener('window:resize')
-  onResize(): void {
-    if (window.innerWidth >= 768) {
-      this.isMobileOpen.set(false);
-    }
-  }
-
-  private readLanguage(): 'FR' | 'EN' {
-    try {
-      return localStorage.getItem('spacehub.language') === 'EN' ? 'EN' : 'FR';
-    } catch {
-      return 'FR';
-    }
+  private seedDemoNotifications(): void {
+    const t = (key: string) => this.transloco.translate(`shell.notifications.demo.${key}`);
+    const ago = (minutes: number) => new Date(Date.now() - minutes * 60_000);
+    this.notifications.push({ kind: 'warning', title: t('documentsTitle'), message: t('documentsMessage'), createdAt: ago(60 * 26) });
+    this.notifications.push({ kind: 'success', title: t('securityTitle'), message: t('securityMessage'), createdAt: ago(180) });
+    this.notifications.push({ kind: 'info', title: t('welcomeTitle'), message: t('welcomeMessage'), createdAt: ago(2) });
   }
 }

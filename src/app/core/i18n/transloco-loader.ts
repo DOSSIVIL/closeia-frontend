@@ -6,7 +6,7 @@ const translations: Record<string, Translation> = {
   fr: {
     nav: {
       overview: 'Vue d’ensemble',
-      schools: 'Établissements',
+      establishments: 'Établissements',
       users: 'Utilisateurs',
       roles: 'Rôles',
       assignments: 'Affectations',
@@ -60,7 +60,7 @@ const translations: Record<string, Translation> = {
   en: {
     nav: {
       overview: 'Overview',
-      schools: 'Schools',
+      establishments: 'Establishments',
       users: 'Users',
       roles: 'Roles',
       assignments: 'Assignments',

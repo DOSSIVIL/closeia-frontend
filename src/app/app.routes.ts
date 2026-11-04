@@ -23,16 +23,18 @@ export const routes: Routes = [
         loadComponent: () => import('./features/dashboard/pages/dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
-        path: 'schools',
-        loadComponent: () => import('./features/schools/pages/school-list/school-list').then((m) => m.SchoolList),
+        path: 'etablissements',
+        loadChildren: () =>
+          import('./features/etablissements/etablissements.routes').then((m) => m.ETABLISSEMENTS_ROUTES),
       },
+      { path: 'schools', pathMatch: 'full', redirectTo: 'etablissements' },
       {
         path: 'schools/new',
-        loadComponent: () => import('./features/schools/pages/school-form/school-form').then((m) => m.SchoolForm),
+        redirectTo: 'etablissements',
       },
       {
         path: 'schools/:id/edit',
-        loadComponent: () => import('./features/schools/pages/school-form/school-form').then((m) => m.SchoolForm),
+        redirectTo: 'etablissements',
       },
       {
         path: 'users',

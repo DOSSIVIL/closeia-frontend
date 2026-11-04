@@ -1,0 +1,275 @@
+<section class="mx-auto w-full max-w-6xl space-y-6">
+    <!-- En-tête -->
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div class="space-y-1">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#93C5FD] to-[#60A5FA] shadow-sm shadow-blue-200 dark:shadow-blue-900/40">
+                    <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Établissements</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                        Gère les écoles de la plateforme et les domaines e-mail autorisés.
+                    </p>
+                </div>
+            </div>
+        </div>
+        @if (canManage()) {
+        <button type="button" (click)="openCreate()" class="group inline-flex items-center gap-2 rounded-xl bg-[#93C5FD] px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm shadow-blue-200/50 transition-all hover:bg-[#7fb5f5] hover:shadow-md hover:shadow-blue-200/60 active:scale-[0.98] dark:shadow-blue-900/30">
+            <svg class="h-4 w-4 transition-transform group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Nouvel établissement
+        </button> }
+    </div>
+
+    <!-- Filtres -->
+    <div class="flex flex-wrap items-center gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div class="relative min-w-64 flex-1">
+            <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="search" placeholder="Rechercher par nom, sigle, domaine ou ville…" (input)="onSearch($any($event.target).value)" class="w-full rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-[#93C5FD] focus:bg-white focus:ring-4 focus:ring-[#93C5FD]/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-slate-800"
+            />
+        </div>
+        <div class="relative">
+            <select (change)="onStatut($any($event.target).value)" class="appearance-none rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] py-2.5 pl-3 pr-9 text-sm text-slate-700 outline-none transition-all focus:border-[#93C5FD] focus:ring-4 focus:ring-[#93C5FD]/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100">
+                <option value="tous">Tous les statuts</option>
+                <option value="actifs">Actifs</option>
+                <option value="inactifs">Inactifs</option>
+            </select>
+            <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Liste -->
+    <div class="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        @if (loadError()) {
+        <div class="flex flex-col items-center gap-4 p-12 text-center">
+            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-[#E4574C]/10">
+                <svg class="h-7 w-7 text-[#E4574C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-slate-900 dark:text-slate-100">Échec du chargement</p>
+                <p class="mt-1 text-sm text-[#E4574C]">{{ loadError() }}</p>
+            </div>
+            <button (click)="load()" class="inline-flex items-center gap-2 rounded-xl border border-[#E5E7EB] px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-[#F9FAFB] dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Réessayer
+            </button>
+        </div>
+        } @else if (loading() && items().length === 0) {
+        <div class="space-y-3 p-6">
+            @for (i of [1, 2, 3]; track i) {
+            <div class="flex items-center gap-4">
+                <div class="h-10 w-10 animate-pulse rounded-lg bg-[#E5E7EB]/60 dark:bg-slate-700/60"></div>
+                <div class="flex-1 space-y-2">
+                    <div class="h-3.5 w-1/3 animate-pulse rounded bg-[#E5E7EB]/60 dark:bg-slate-700/60"></div>
+                    <div class="h-3 w-1/4 animate-pulse rounded bg-[#E5E7EB]/40 dark:bg-slate-700/40"></div>
+                </div>
+                <div class="h-6 w-16 animate-pulse rounded-full bg-[#E5E7EB]/60 dark:bg-slate-700/60"></div>
+            </div>
+            }
+        </div>
+        } @else if (items().length === 0) {
+        <div class="flex flex-col items-center gap-4 p-16 text-center">
+            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F9FAFB] dark:bg-slate-800">
+                <svg class="h-8 w-8 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-base font-semibold text-slate-900 dark:text-slate-100">Aucun établissement trouvé</p>
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Modifie tes filtres ou crée un nouvel établissement.</p>
+            </div>
+            @if (canManage()) {
+            <button (click)="openCreate()" class="mt-2 inline-flex items-center gap-2 rounded-xl bg-[#93C5FD] px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-[#7fb5f5]">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Créer le premier
+            </button> }
+        </div>
+        } @else {
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="border-b border-[#E5E7EB] bg-[#F9FAFB]/80 text-[11px] uppercase tracking-wider text-slate-500 dark:border-slate-700 dark:bg-slate-800/60">
+                    <tr>
+                        <th class="px-5 py-3.5 font-semibold">Établissement</th>
+                        <th class="px-5 py-3.5 font-semibold">Domaine e-mail</th>
+                        <th class="hidden px-5 py-3.5 font-semibold md:table-cell">Ville</th>
+                        <th class="px-5 py-3.5 font-semibold">Statut</th>
+                        @if (canManage()) {
+                        <th class="px-5 py-3.5 text-right font-semibold">Actions</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#E5E7EB]/80 dark:divide-slate-700/80">
+                    @for (e of items(); track e.id) {
+                    <tr class="group transition-colors hover:bg-[#F9FAFB] dark:hover:bg-slate-800/40">
+                        <td class="px-5 py-3.5">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#E5E7EB] bg-gradient-to-br from-[#F9FAFB] to-white text-xs font-semibold text-slate-600 shadow-sm dark:border-slate-600 dark:from-slate-800 dark:to-slate-800/60">
+                                    @if (e.logoUrl) {
+                                    <img [src]="e.logoUrl" [alt]="e.nom" class="h-full w-full object-contain p-1" /> } @else { {{ initiales(e) }} }
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="truncate font-medium text-slate-900 dark:text-slate-100">{{ e.nom }}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ e.sigle }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-5 py-3.5">
+                            <span class="inline-flex items-center gap-1.5 rounded-md bg-[#F9FAFB] px-2 py-1 font-mono text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                <svg class="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                {{ e.domaineEmail }}
+                            </span>
+                        </td>
+                        <td class="hidden px-5 py-3.5 text-slate-600 md:table-cell dark:text-slate-300">
+                            @if (e.ville) {
+                            <span class="inline-flex items-center gap-1.5">
+                                <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                {{ e.ville }}
+                            </span> } @else {
+                            <span class="text-slate-400 dark:text-slate-500">—</span> }
+                        </td>
+                        <td class="px-5 py-3.5">
+                            <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset" [class]="e.actif
+                                    ? 'bg-[#99D8C9]/20 text-teal-800 ring-[#99D8C9]/40 dark:bg-[#99D8C9]/10 dark:text-teal-300 dark:ring-[#99D8C9]/20'
+                                    : 'bg-slate-100 text-slate-600 ring-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-700'">
+                                <span class="h-1.5 w-1.5 rounded-full" [class]="e.actif ? 'bg-teal-500' : 'bg-slate-400'"></span> {{ e.actif ? 'Actif' : 'Inactif' }}
+                            </span>
+                        </td>
+                        @if (canManage()) {
+                        <td class="px-5 py-3.5">
+                            <div class="flex justify-end gap-1 opacity-60 transition-opacity group-hover:opacity-100">
+                                <button (click)="openEdit(e)" title="Modifier" class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-[#93C5FD]/20 hover:text-[#2563EB] dark:text-slate-400 dark:hover:text-[#93C5FD]">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                                <button (click)="toggleStatut(e)" [title]="e.actif ? 'Désactiver' : 'Activer'" class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-amber-100 hover:text-amber-600 dark:text-slate-400 dark:hover:bg-amber-900/20 dark:hover:text-amber-400">
+                                    @if (e.actif) {
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                    } @else {
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    }
+                                </button>
+                                <button (click)="toDelete.set(e)" title="Supprimer" class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-[#E4574C]/10 hover:text-[#E4574C] dark:text-slate-400">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                        }
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-[#E5E7EB] bg-[#F9FAFB]/50 px-5 py-3 text-sm dark:border-slate-700 dark:bg-slate-800/40">
+            <span class="text-slate-500 dark:text-slate-400">
+                <span class="font-semibold text-slate-700 dark:text-slate-200">{{ meta().total }}</span> établissement(s)
+            </span>
+            <div class="flex items-center gap-2">
+                <button (click)="goTo(meta().page - 1)" [disabled]="meta().page <= 1" class="inline-flex items-center gap-1 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-[#F9FAFB] disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Précédent
+                </button>
+                <span class="rounded-lg bg-white px-3 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-[#E5E7EB] dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-600">
+                    {{ meta().page }} / {{ meta().totalPages }}
+                </span>
+                <button (click)="goTo(meta().page + 1)" [disabled]="meta().page >= meta().totalPages" class="inline-flex items-center gap-1 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-[#F9FAFB] disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+                    Suivant
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+</section>
+
+<!-- Formulaire -->
+@if (formOpen()) {
+<app-etablissement-form [etablissement]="editing()" (saved)="onSaved($event)" (closed)="formOpen.set(false)" /> }
+
+<!-- Confirmation de suppression -->
+@if (toDelete(); as target) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200" (click)="toDelete.set(null)">
+    <div class="w-full max-w-md overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900 animate-in zoom-in-95 duration-200" (click)="$event.stopPropagation()">
+        <div class="flex items-start gap-4 p-6">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#E4574C]/10">
+                <svg class="h-6 w-6 text-[#E4574C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Supprimer l'établissement ?</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                    « <span class="font-medium text-slate-900 dark:text-slate-100">{{ target.nom }}</span> » sera supprimé définitivement. Pour bloquer temporairement ses adresses e-mail, préfère le désactiver.
+                </p>
+            </div>
+        </div>
+        <div class="flex justify-end gap-3 border-t border-[#E5E7EB] bg-[#F9FAFB]/60 px-6 py-4 dark:border-slate-700 dark:bg-slate-800/40">
+            <button (click)="toDelete.set(null)" class="rounded-xl border border-[#E5E7EB] bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-[#F9FAFB] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
+                Annuler
+            </button>
+            <button (click)="confirmDelete()" [disabled]="deleting()" class="inline-flex items-center gap-2 rounded-xl bg-[#E4574C] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#d24a40] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60">
+                @if (deleting()) {
+                <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Suppression…
+                } @else {
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Supprimer
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Notification -->
+@if (toast(); as t) {
+<div class="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-sm shadow-xl dark:bg-slate-900 animate-in slide-in-from-bottom-4 duration-300" [class]="t.type === 'ok'
+        ? 'border-[#99D8C9]/60 text-teal-800 dark:border-[#99D8C9]/30 dark:text-teal-300'
+        : 'border-[#E4574C]/40 text-[#b8352b] dark:border-[#E4574C]/30 dark:text-red-300'">
+    @if (t.type === 'ok') {
+    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg> } @else {
+    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg> }
+    <span class="font-medium">{{ t.text }}</span>
+</div>
+}

@@ -75,8 +75,7 @@
                 </div>
                 <div class="chart-legend">
                     <span class="legend-item">
-                        <span class="legend-dot bg-[#93C5FD]"></span>
-                        Cette semaine
+                        <span class="legend-dot bg-[#93C5FD]"></span> Cette semaine
                     </span>
                 </div>
             </div>
@@ -86,9 +85,7 @@
                     @for (value of chartData(); track $index) {
                     <div class="chart-bar-wrapper">
                         <div class="chart-bar-bg">
-                            <div class="chart-bar" 
-                                 [style.height.%]="(value / maxChartValue()) * 100"
-                                 [style.animation-delay.ms]="$index * 50">
+                            <div class="chart-bar" [style.height.%]="(value / maxChartValue()) * 100" [style.animation-delay.ms]="$index * 50">
                                 <span class="chart-bar-value">{{ value }}</span>
                             </div>
                         </div>
@@ -128,21 +125,21 @@
         </div>
     </div>
 
-    <!-- ===================== ÉCOLES TABLE ===================== -->
+    <!-- ===================== ÉTABLISSEMENTS TABLE ===================== -->
     <div class="table-card">
         <div class="card-header">
             <div>
-                <h3 class="card-title">Écoles récentes</h3>
-                <p class="card-subtitle">{{ activeSchools() }} écoles actives sur {{ schools().length }}</p>
+                <h3 class="card-title">Établissements récents</h3>
+                <p class="card-subtitle">{{ activeSchools() }} établissements actifs sur {{ schools().length }}</p>
             </div>
-            <a routerLink="/schools" class="btn-text">Gérer les écoles →</a>
+            <a routerLink="/etablissements" class="btn-text">Gérer les établissements →</a>
         </div>
 
         <div class="table-container">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>École</th>
+                        <th>Établissement</th>
                         <th>Utilisateurs</th>
                         <th>Documents</th>
                         <th>Statut</th>
@@ -165,8 +162,7 @@
                         <td>{{ school.documents | number }}</td>
                         <td>
                             <span class="status-badge" [class]="school.status === 'active' ? 'status-active' : 'status-inactive'">
-                                <span class="status-dot"></span>
-                                {{ school.status === 'active' ? 'Active' : 'Inactive' }}
+                                <span class="status-dot"></span> {{ school.status === 'active' ? 'Active' : 'Inactive' }}
                             </span>
                         </td>
                         <td class="text-muted">{{ school.createdAt | date:'dd MMM yyyy' }}</td>

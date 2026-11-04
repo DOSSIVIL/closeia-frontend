@@ -11,7 +11,7 @@ export interface NavItem {
 
 export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/dashboard', labelKey: 'nav.overview', icon: 'home', permission: 'dashboard.read' },
-  { path: '/schools', labelKey: 'nav.schools', icon: 'school', permission: 'schools.read' },
+  { path: '/etablissements', labelKey: 'nav.establishments', icon: 'school', permission: 'schools.read' },
   { path: '/users', labelKey: 'nav.users', icon: 'users', permission: 'users.read' },
   { path: '/roles', labelKey: 'nav.roles', icon: 'shield', permission: 'roles.read' },
   { path: '/assignments', labelKey: 'nav.assignments', icon: 'userCheck', permission: 'assignments.read' },

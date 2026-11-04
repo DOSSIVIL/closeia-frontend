@@ -1,0 +1,118 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4" (click)="closed.emit()">
+    <div class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+        <header class="flex items-center justify-between border-b border-[#E5E7EB] px-6 py-4 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                {{ isEdit ? "Modifier l'établissement" : 'Nouvel établissement' }}
+            </h2>
+            <button type="button" (click)="closed.emit()" class="rounded-lg p-2 text-slate-500 hover:bg-[#F9FAFB] dark:hover:bg-slate-800" aria-label="Fermer">
+        ✕
+      </button>
+        </header>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5 px-6 py-5">
+            @if (errorMessage()) {
+            <div class="rounded-lg border border-[#E4574C]/40 bg-[#E4574C]/10 px-4 py-3 text-sm text-[#b8352b]">
+                {{ errorMessage() }}
+            </div>
+            }
+
+            <!-- Logo -->
+            <div class="flex items-center gap-4">
+                <div class="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl border border-dashed border-[#E5E7EB] bg-[#F9FAFB] dark:border-slate-600 dark:bg-slate-800">
+                    @if (logoPreview()) {
+                    <img [src]="logoPreview()" alt="Logo" class="h-full w-full object-contain" /> } @else {
+                    <span class="text-xs text-slate-400">Logo</span> }
+                </div>
+                <div class="space-y-1">
+                    <div class="flex gap-2">
+                        <label class="cursor-pointer rounded-lg bg-[#93C5FD] px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-[#7fb5f5]">
+              Choisir un logo
+              <input type="file" class="hidden" accept="image/png,image/jpeg,image/webp,image/svg+xml" (change)="onLogoSelected($event)" />
+            </label> @if (logoPreview()) {
+                        <button type="button" (click)="clearLogo()" class="rounded-lg px-3 py-1.5 text-sm text-[#E4574C] hover:bg-[#E4574C]/10">
+                Retirer
+              </button> }
+                    </div>
+                    <p class="text-xs text-slate-500">PNG, JPG, WEBP ou SVG · 2 Mo max</p>
+                    @if (logoError()) {
+                    <p class="text-xs text-[#E4574C]">{{ logoError() }}</p>
+                    }
+                </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300" for="nom">Nom *</label>
+                    <input id="nom" formControlName="nom" type="text" placeholder="Saint Jean Ingénieur" class="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm outline-none focus:border-[#93C5FD] focus:ring-2 focus:ring-[#93C5FD]/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                    /> @if (hasError('nom')) {
+                    <p class="mt-1 text-xs text-[#E4574C]">Le nom est obligatoire</p> }
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300" for="sigle">Sigle *</label>
+                    <input id="sigle" formControlName="sigle" type="text" placeholder="SJI" class="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm uppercase outline-none focus:border-[#93C5FD] focus:ring-2 focus:ring-[#93C5FD]/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                    /> @if (hasError('sigle')) {
+                    <p class="mt-1 text-xs text-[#E4574C]">2 à 20 caractères (lettres, chiffres, tiret)</p> }
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300" for="domaine">Domaine e-mail *</label>
+                    <input id="domaine" formControlName="domaineEmail" type="text" placeholder="saintjeaningenieur.org" class="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm outline-none focus:border-[#93C5FD] focus:ring-2 focus:ring-[#93C5FD]/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                    /> @if (hasError('domaineEmail')) {
+                    <p class="mt-1 text-xs text-[#E4574C]">Domaine invalide (ex. saintjeaningenieur.org)</p> }
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300" for="description">Description</label>
+                    <textarea id="description" formControlName="description" rows="3" class="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm outline-none focus:border-[#93C5FD] focus:ring-2 focus:ring-[#93C5FD]/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"></textarea>
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300" for="ville">Ville</label>
+                    <input id="ville" formControlName="ville" type="text" placeholder="Yaoundé" class="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm outline-none focus:border-[#93C5FD] focus:ring-2 focus:ring-[#93C5FD]/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                    />
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300" for="telephone">Téléphone</label>
+                    <input id="telephone" formControlName="telephone" type="tel" class="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm outline-none focus:border-[#93C5FD] focus:ring-2 focus:ring-[#93C5FD]/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                    />
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300" for="adresse">Adresse</label>
+                    <input id="adresse" formControlName="adresse" type="text" class="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm outline-none focus:border-[#93C5FD] focus:ring-2 focus:ring-[#93C5FD]/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                    />
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300" for="emailContact">E-mail de contact</label>
+                    <input id="emailContact" formControlName="emailContact" type="email" class="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm outline-none focus:border-[#93C5FD] focus:ring-2 focus:ring-[#93C5FD]/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                    /> @if (hasError('emailContact')) {
+                    <p class="mt-1 text-xs text-[#E4574C]">E-mail invalide</p> }
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300" for="siteWeb">Site web</label>
+                    <input id="siteWeb" formControlName="siteWeb" type="url" placeholder="https://..." class="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm outline-none focus:border-[#93C5FD] focus:ring-2 focus:ring-[#93C5FD]/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                    /> @if (hasError('siteWeb')) {
+                    <p class="mt-1 text-xs text-[#E4574C]">URL invalide (https://...)</p> }
+                </div>
+            </div>
+
+            <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+        <input type="checkbox" formControlName="actif" class="h-4 w-4 rounded border-[#E5E7EB] accent-[#99D8C9]" />
+        Établissement actif (les adresses de ce domaine peuvent se connecter)
+      </label>
+
+            <footer class="flex justify-end gap-3 border-t border-[#E5E7EB] pt-4 dark:border-slate-700">
+                <button type="button" (click)="closed.emit()" class="rounded-lg border border-[#E5E7EB] px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#F9FAFB] dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">
+          Annuler
+        </button>
+                <button type="submit" [disabled]="submitting()" class="rounded-lg bg-[#93C5FD] px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-[#7fb5f5] disabled:cursor-not-allowed disabled:opacity-60">
+          {{ submitting() ? 'Enregistrement…' : isEdit ? 'Enregistrer' : "Créer l'établissement" }}
+        </button>
+            </footer>
+        </form>
+    </div>
+</div>

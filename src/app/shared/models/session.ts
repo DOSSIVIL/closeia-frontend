@@ -5,6 +5,7 @@ export interface AuthUser {
   avatarUrl?: string;
   roles: string[];
   permissions: string[];
+  documentScopes?: string[];
   schoolId?: string;
 }
 

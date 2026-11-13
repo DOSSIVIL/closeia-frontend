@@ -1,1 +1,473 @@
-<p>assignment-list works!</p>
+<section class="assignments-page">
+  <header class="assignments-header">
+    <div>
+      <p class="assignments-eyebrow">ADMINISTRATION</p>
+      <h1>Affectations</h1>
+      <p class="assignments-subtitle">
+        Attribuez les bons rôles aux utilisateurs et maîtrisez leurs accès par établissement.
+      </p>
+    </div>
+    @if (canManage()) {
+      <button
+        class="assignment-button assignment-button-primary"
+        type="button"
+        (click)="openCreate()"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        Nouvelle affectation
+      </button>
+    }
+  </header>
+
+  <div class="assignment-stats" aria-label="Résumé des affectations">
+    <article class="assignment-stat">
+      <span class="assignment-stat-icon stat-all" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      </span>
+      <span class="assignment-stat-label">Affectations</span>
+      <strong>{{ stats().total }}</strong>
+    </article>
+    <article class="assignment-stat">
+      <span class="assignment-stat-icon stat-admin" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      </span>
+      <span class="assignment-stat-label">Administrateurs d’école</span>
+      <strong>{{ stats().schoolAdmins }}</strong>
+    </article>
+    <article class="assignment-stat">
+      <span class="assignment-stat-icon stat-staff" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      </span>
+      <span class="assignment-stat-label">Personnel</span>
+      <strong>{{ stats().staff }}</strong>
+    </article>
+    <article class="assignment-stat">
+      <span class="assignment-stat-icon stat-student" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="m2 10 10-5 10 5-10 5-10-5Z" />
+          <path d="M6 12v5c3.5 3 8.5 3 12 0v-5M22 10v6" />
+        </svg>
+      </span>
+      <span class="assignment-stat-label">Élèves / étudiants</span>
+      <strong>{{ stats().students }}</strong>
+    </article>
+  </div>
+
+  <div class="assignment-toolbar">
+    <label class="assignment-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+      <span class="sr-only">Rechercher une affectation</span>
+      <input
+        type="search"
+        placeholder="Rechercher un utilisateur, rôle ou établissement…"
+        (input)="onSearch($any($event.target).value)"
+      />
+    </label>
+    <label class="assignment-select">
+      <span class="sr-only">Filtrer par rôle</span>
+      <select [value]="roleFilter()" (change)="onRoleFilter($any($event.target).value)">
+        <option value="">Tous les rôles</option>
+        @for (role of roles(); track role.code) {
+          <option [value]="role.code">{{ role.name }}</option>
+        }
+      </select>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+    </label>
+    @if (canChooseSchool()) {
+      <label class="assignment-select assignment-school-filter">
+        <span class="sr-only">Filtrer par établissement</span>
+        <select [value]="schoolFilter()" (change)="onSchoolFilter($any($event.target).value)">
+          <option value="">Tous les établissements</option>
+          @for (school of schools(); track school.id) {
+            <option [value]="school.id">{{ school.nom }}</option>
+          }
+        </select>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+      </label>
+    }
+  </div>
+
+  @if (loadError()) {
+    <div class="assignment-state assignment-error" role="alert">
+      <span class="assignment-state-icon" aria-hidden="true">!</span>
+      <div>
+        <strong>Impossible de charger les affectations</strong>
+        <p>{{ loadError() }}</p>
+      </div>
+      <button class="assignment-button assignment-button-secondary" type="button" (click)="load()">
+        Réessayer
+      </button>
+    </div>
+  } @else if (loading() && items().length === 0) {
+    <div class="assignment-loading" role="status" aria-label="Chargement des affectations">
+      @for (row of [1, 2, 3, 4]; track row) {
+        <div class="assignment-loading-row"><span></span><i></i><i></i></div>
+      }
+    </div>
+  } @else if (items().length === 0) {
+    <div class="assignment-state assignment-empty">
+      <span class="assignment-empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="m16 11 2 2 4-4" />
+        </svg>
+      </span>
+      <strong>Aucune affectation trouvée</strong>
+      <p>Les rôles attribués apparaîtront ici. Commencez par créer une affectation.</p>
+      @if (canManage()) {
+        <button
+          class="assignment-button assignment-button-primary"
+          type="button"
+          (click)="openCreate()"
+        >
+          Créer une affectation
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="assignment-table-wrap">
+      <table class="assignment-table">
+        <thead>
+          <tr>
+            <th scope="col">Utilisateur</th>
+            <th scope="col">Rôle attribué</th>
+            <th scope="col">Établissement</th>
+            <th scope="col">Statut du compte</th>
+            <th scope="col">Attribué le</th>
+            @if (canManage()) {
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (assignment of items(); track assignment.id) {
+            <tr>
+              <td>
+                <div class="assignment-identity">
+                  <span class="assignment-avatar">{{ initials(assignment) }}</span>
+                  <span class="assignment-identity-copy">
+                    <strong>{{ assignment.user.firstName }} {{ assignment.user.lastName }}</strong>
+                    <span>{{ assignment.user.email }}</span>
+                  </span>
+                </div>
+              </td>
+              <td>
+                <span class="assignment-role-chip">{{ assignment.role.name }}</span>
+              </td>
+              <td>{{ assignment.school.name }}</td>
+              <td>
+                <span
+                  class="account-status"
+                  [class]="`account-${assignment.user.status.toLowerCase()}`"
+                  >{{
+                    assignment.user.status === 'ACTIVE'
+                      ? 'Actif'
+                      : assignment.user.status === 'INVITED'
+                        ? 'En attente'
+                        : 'Suspendu'
+                  }}</span
+                >
+              </td>
+              <td>{{ assignment.createdAt | date: 'dd/MM/yyyy' }}</td>
+              @if (canManage()) {
+                <td>
+                  @if (assignment.user.id !== currentUserId()) {
+                    <button
+                      class="assignment-icon-button assignment-remove"
+                      type="button"
+                      [attr.aria-label]="
+                        'Retirer le rôle ' +
+                        assignment.role.name +
+                        ' de ' +
+                        assignment.user.firstName +
+                        ' ' +
+                        assignment.user.lastName
+                      "
+                      (click)="requestRemoval(assignment)"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 6h18" />
+                        <path d="M8 6V4h8v2" />
+                        <path d="m19 6-1 14H6L5 6" />
+                        <path d="M10 11v5M14 11v5" />
+                      </svg>
+                    </button>
+                  } @else {
+                    <span class="assignment-self-label">Votre compte</span>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="assignment-mobile-list">
+      @for (assignment of items(); track assignment.id) {
+        <article class="assignment-mobile-card">
+          <header class="assignment-mobile-header">
+            <div class="assignment-identity">
+              <span class="assignment-avatar">{{ initials(assignment) }}</span>
+              <span class="assignment-identity-copy"
+                ><strong>{{ assignment.user.firstName }} {{ assignment.user.lastName }}</strong
+                ><span>{{ assignment.user.email }}</span></span
+              >
+            </div>
+            <span class="assignment-role-chip">{{ assignment.role.name }}</span>
+          </header>
+          <dl class="assignment-mobile-details">
+            <div>
+              <dt>Établissement</dt>
+              <dd>{{ assignment.school.name }}</dd>
+            </div>
+            <div>
+              <dt>Compte</dt>
+              <dd>
+                <span
+                  class="account-status"
+                  [class]="`account-${assignment.user.status.toLowerCase()}`"
+                  >{{
+                    assignment.user.status === 'ACTIVE'
+                      ? 'Actif'
+                      : assignment.user.status === 'INVITED'
+                        ? 'En attente'
+                        : 'Suspendu'
+                  }}</span
+                >
+              </dd>
+            </div>
+            <div>
+              <dt>Attribué le</dt>
+              <dd>{{ assignment.createdAt | date: 'dd/MM/yyyy' }}</dd>
+            </div>
+          </dl>
+          @if (canManage() && assignment.user.id !== currentUserId()) {
+            <button
+              class="assignment-button assignment-button-danger"
+              type="button"
+              (click)="requestRemoval(assignment)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 6h18" />
+                <path d="M8 6V4h8v2" />
+                <path d="m19 6-1 14H6L5 6" />
+                <path d="M10 11v5M14 11v5" />
+              </svg>
+              Retirer ce rôle
+            </button>
+          }
+        </article>
+      }
+    </div>
+
+    <footer class="assignment-pagination">
+      <span
+        >{{ meta().total }} résultat{{ meta().total > 1 ? 's' : '' }} · Page {{ meta().page }} sur
+        {{ meta().totalPages }}</span
+      >
+      <div>
+        <button
+          class="assignment-button assignment-button-secondary"
+          type="button"
+          [disabled]="meta().page <= 1 || loading()"
+          (click)="goTo(meta().page - 1)"
+        >
+          Précédent
+        </button>
+        <button
+          class="assignment-button assignment-button-secondary"
+          type="button"
+          [disabled]="meta().page >= meta().totalPages || loading()"
+          (click)="goTo(meta().page + 1)"
+        >
+          Suivant
+        </button>
+      </div>
+    </footer>
+  }
+</section>
+
+@if (formOpen()) {
+  <div class="assignment-dialog-backdrop" (click)="closeForm()">
+    <section
+      class="assignment-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="assignment-form-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="assignment-dialog-header">
+        <div>
+          <p class="assignments-eyebrow">GESTION DES ACCÈS</p>
+          <h2 id="assignment-form-title">Nouvelle affectation</h2>
+        </div>
+        <button
+          class="assignment-icon-button"
+          type="button"
+          aria-label="Fermer"
+          [disabled]="saving()"
+          (click)="closeForm()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 6-12 12M6 6l12 12" /></svg>
+        </button>
+      </header>
+      <form class="assignment-form" (ngSubmit)="saveAssignment()">
+        @if (formError()) {
+          <p class="assignment-form-error" role="alert">{{ formError() }}</p>
+        }
+        <p class="assignment-form-intro">
+          Choisissez une personne et le niveau d’accès qu’elle doit recevoir dans l’établissement
+          concerné.
+        </p>
+        @if (canChooseSchool()) {
+          <label>
+            <span>Établissement <b>*</b></span>
+            <select
+              name="schoolId"
+              [(ngModel)]="form.schoolId"
+              (ngModelChange)="onFormSchoolChange()"
+              required
+              [disabled]="schoolsLoading()"
+            >
+              <option value="" disabled>
+                {{ schoolsLoading() ? 'Chargement…' : 'Sélectionner un établissement' }}
+              </option>
+              @for (school of schools(); track school.id) {
+                <option [value]="school.id">{{ school.nom }} · {{ school.domaineEmail }}</option>
+              }
+            </select>
+          </label>
+        }
+        <label>
+          <span>Utilisateur <b>*</b></span>
+          <select
+            name="userId"
+            [(ngModel)]="form.userId"
+            required
+            [disabled]="usersLoading() || !form.schoolId"
+          >
+            <option value="" disabled>
+              {{
+                !form.schoolId
+                  ? 'Sélectionnez d’abord un établissement'
+                  : usersLoading()
+                    ? 'Chargement…'
+                    : 'Sélectionner un utilisateur'
+              }}
+            </option>
+            @for (user of users(); track user.id) {
+              <option [value]="user.id">
+                {{ user.firstName }} {{ user.lastName }} · {{ user.email
+                }}{{ user.status === 'INVITED' ? ' · En attente' : '' }}
+              </option>
+            }
+          </select>
+          @if (!usersLoading() && form.schoolId && users().length === 0) {
+            <small>Aucun utilisateur actif ou en attente dans cet établissement.</small>
+          }
+        </label>
+        <label>
+          <span>Rôle à attribuer <b>*</b></span>
+          <select name="roleCode" [(ngModel)]="form.roleCode" required [disabled]="rolesLoading()">
+            <option value="" disabled>
+              {{ rolesLoading() ? 'Chargement…' : 'Sélectionner un rôle' }}
+            </option>
+            @for (role of roles(); track role.code) {
+              <option [value]="role.code">{{ role.name }}</option>
+            }
+          </select>
+        </label>
+        @if (form.roleCode) {
+          <div class="assignment-role-help">
+            <strong>{{ roleName(form.roleCode) }}</strong>
+            <p>{{ roleDescription(form.roleCode) }}</p>
+          </div>
+        }
+        <p class="assignment-form-note">
+          L’affectation prend effet immédiatement. Les utilisateurs suspendus ne peuvent pas se
+          connecter.
+        </p>
+        <footer class="assignment-dialog-actions">
+          <button
+            class="assignment-button assignment-button-secondary"
+            type="button"
+            [disabled]="saving()"
+            (click)="closeForm()"
+          >
+            Annuler
+          </button>
+          <button
+            class="assignment-button assignment-button-primary"
+            type="submit"
+            [disabled]="saving() || rolesLoading() || schoolsLoading() || usersLoading()"
+          >
+            {{ saving() ? 'Attribution…' : 'Attribuer le rôle' }}
+          </button>
+        </footer>
+      </form>
+    </section>
+  </div>
+}
+
+@if (removeTarget(); as target) {
+  <div class="assignment-dialog-backdrop" (click)="removing() ? null : removeTarget.set(null)">
+    <section
+      class="assignment-dialog assignment-confirm-dialog"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="remove-title"
+      (click)="$event.stopPropagation()"
+    >
+      <span class="assignment-confirm-icon" aria-hidden="true"
+        ><svg viewBox="0 0 24 24">
+          <path d="M3 6h18" />
+          <path d="M8 6V4h8v2" />
+          <path d="m19 6-1 14H6L5 6" />
+          <path d="M10 11v5M14 11v5" /></svg
+      ></span>
+      <h2 id="remove-title">Retirer cette affectation ?</h2>
+      <p>
+        Le rôle <strong>{{ target.role.name }}</strong> sera retiré à
+        <strong>{{ target.user.firstName }} {{ target.user.lastName }}</strong> pour l’établissement
+        <strong>{{ target.school.name }}</strong
+        >. Cette action modifie immédiatement ses accès.
+      </p>
+      @if (removeError()) {
+        <p class="assignment-form-error" role="alert">{{ removeError() }}</p>
+      }
+      <div class="assignment-dialog-actions">
+        <button
+          class="assignment-button assignment-button-secondary"
+          type="button"
+          [disabled]="removing()"
+          (click)="removeTarget.set(null)"
+        >
+          Annuler
+        </button>
+        <button
+          class="assignment-button assignment-button-danger"
+          type="button"
+          [disabled]="removing()"
+          (click)="confirmRemoval()"
+        >
+          {{ removing() ? 'Retrait…' : 'Retirer le rôle' }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

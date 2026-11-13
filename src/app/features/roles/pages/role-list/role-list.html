@@ -1,1 +1,362 @@
-<p>role-list works!</p>
+<main class="roles-page">
+  <header class="roles-header">
+    <div>
+      <p class="roles-eyebrow">ADMINISTRATION · CONTRÔLE D’ACCÈS</p>
+      <h1>Gestion des rôles</h1>
+      <p class="roles-subtitle">
+        Définissez les actions autorisées et les périmètres documentaires de chaque rôle.
+      </p>
+    </div>
+    @if (canManage()) {
+      <button class="role-button role-button-primary" type="button" (click)="openCreate()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        Créer un rôle
+      </button>
+    }
+  </header>
+
+  <section class="role-summary" aria-label="Résumé des rôles">
+    <article class="role-summary-card">
+      <span class="summary-icon summary-icon-blue" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      </span>
+      <span
+        ><small>Rôles disponibles</small><strong>{{ roles().length }}</strong></span
+      >
+    </article>
+    <article class="role-summary-card">
+      <span class="summary-icon summary-icon-violet" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M19 8v6m-3-3h6" />
+        </svg>
+      </span>
+      <span
+        ><small>Rôles personnalisés</small><strong>{{ customRoleCount() }}</strong></span
+      >
+    </article>
+    <article class="role-summary-card">
+      <span class="summary-icon summary-icon-green" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      </span>
+      <span
+        ><small>Affectations de rôles</small><strong>{{ assignedUserCount() }}</strong></span
+      >
+    </article>
+  </section>
+
+  <section class="roles-toolbar" aria-label="Recherche des rôles">
+    <label class="role-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+      <span class="sr-only">Rechercher un rôle</span>
+      <input
+        type="search"
+        placeholder="Rechercher par nom, code ou description…"
+        [value]="search()"
+        (input)="search.set($any($event.target).value)"
+      />
+    </label>
+    <span class="role-result-count">{{ filteredRoles().length }} rôle(s)</span>
+  </section>
+
+  @if (loadError()) {
+    <section class="role-state role-error" role="alert">
+      <strong>Le chargement des rôles a échoué</strong>
+      <p>{{ loadError() }}</p>
+      <button class="role-button role-button-secondary" type="button" (click)="load()">
+        Réessayer
+      </button>
+    </section>
+  } @else if (loading() && roles().length === 0) {
+    <div class="role-loading" role="status" aria-label="Chargement des rôles">
+      @for (row of [1, 2, 3]; track row) {
+        <div><i></i><span></span><span></span></div>
+      }
+    </div>
+  } @else if (filteredRoles().length === 0) {
+    <section class="role-state role-empty">
+      <span class="empty-shield" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z" /></svg>
+      </span>
+      <strong>Aucun rôle correspondant</strong>
+      <p>Essayez un autre terme de recherche ou créez un rôle personnalisé.</p>
+      @if (canManage()) {
+        <button class="role-button role-button-primary" type="button" (click)="openCreate()">
+          Créer un rôle
+        </button>
+      }
+    </section>
+  } @else {
+    <section class="role-grid" aria-label="Rôles">
+      @for (role of filteredRoles(); track role.id) {
+        <article class="role-card" [class.role-card-system]="role.isSystem">
+          <div class="role-card-top">
+            <span class="role-avatar" [class.role-avatar-system]="role.isSystem" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z" />
+                <path d="M9 12h6" />
+              </svg>
+            </span>
+            <span class="role-type" [class.role-type-system]="role.isSystem">
+              @if (role.isSystem) {
+                Système
+              } @else {
+                Personnalisé
+              }
+            </span>
+            @if (canManage() && !role.isSystem) {
+              <button
+                class="role-edit-button"
+                type="button"
+                [attr.aria-label]="'Modifier le rôle ' + role.name"
+                (click)="openEdit(role)"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m15 5 4 4M4 20l4-.8L19 8a2.1 2.1 0 0 0-3-3L5 16l-1 4Z" />
+                </svg>
+                Modifier
+              </button>
+            } @else if (role.isSystem) {
+              <span
+                class="role-lock"
+                title="Les rôles système sont protégés"
+                aria-label="Rôle système protégé"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="4" y="10" width="16" height="11" rx="2" />
+                  <path d="M8 10V7a4 4 0 1 1 8 0v3" />
+                </svg>
+              </span>
+            }
+          </div>
+          <div class="role-card-title">
+            <h2>{{ role.name }}</h2>
+            <code>{{ role.code }}</code>
+          </div>
+          <p class="role-description">{{ role.description || 'Aucune description renseignée.' }}</p>
+
+          <div class="role-card-meta">
+            <span
+              ><strong>{{ permissionCount(role) }}</strong> permission(s)</span
+            >
+            <span
+              ><strong>{{ role.assignmentCount }}</strong> affectation(s)</span
+            >
+          </div>
+
+          <div class="role-card-section">
+            <h3>Permissions principales</h3>
+            <div class="role-chips">
+              @for (permission of role.permissions; track permission) {
+                <span class="role-chip">{{ permission }}</span>
+              } @empty {
+                <span class="role-chip role-chip-muted">Aucune permission</span>
+              }
+            </div>
+          </div>
+
+          <div class="role-card-section role-card-scopes">
+            <h3>Périmètre documentaire</h3>
+            <div class="scope-list">
+              @for (scope of role.documentScopes; track scope) {
+                <span class="scope-pill">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 4h14v16H5z" />
+                    <path d="M8 8h8M8 12h8M8 16h5" />
+                  </svg>
+                  @switch (scope) {
+                    @case ('PLATFORM') {
+                      Toute la plateforme
+                    }
+                    @case ('SCHOOL') {
+                      Établissement
+                    }
+                    @case ('ASSIGNED_SPACES') {
+                      Espaces attribués
+                    }
+                    @case ('OWN_DOCUMENTS') {
+                      Documents personnels
+                    }
+                  }
+                </span>
+              } @empty {
+                <span class="scope-none">Aucun périmètre défini</span>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </section>
+  }
+</main>
+
+@if (formOpen()) {
+  <div class="role-overlay" (click)="closeForm()">
+    <section
+      class="role-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="role-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="role-dialog-header">
+        <div>
+          <p class="roles-eyebrow">CONFIGURATION DES ACCÈS</p>
+          <h2 id="role-dialog-title">{{ editing() ? 'Modifier le rôle' : 'Créer un rôle' }}</h2>
+          <p>Les modifications prennent effet pour les utilisateurs affectés à ce rôle.</p>
+        </div>
+        <button class="role-close" type="button" aria-label="Fermer" (click)="closeForm()">
+          ×
+        </button>
+      </header>
+
+      <div class="role-dialog-body">
+        @if (formError()) {
+          <div class="role-form-error" role="alert">{{ formError() }}</div>
+        }
+
+        <section class="role-form-section">
+          <div class="role-section-heading">
+            <span class="section-number">01</span>
+            <div>
+              <h3>Informations générales</h3>
+              <p>Un identifiant technique stable et un nom facile à reconnaître.</p>
+            </div>
+          </div>
+          <div class="role-form-grid">
+            <label class="role-field role-field-wide">
+              <span>Nom du rôle <i>*</i></span>
+              <input
+                type="text"
+                maxlength="120"
+                placeholder="Ex. Responsable pédagogique"
+                [ngModel]="form.name"
+                (ngModelChange)="onNameChange($event)"
+              />
+            </label>
+            <label class="role-field">
+              <span>Code unique</span>
+              <input type="text" [value]="form.code" readonly />
+              <small>Généré automatiquement à partir du nom.</small>
+            </label>
+            <label class="role-field role-field-wide">
+              <span>Description</span>
+              <textarea
+                rows="2"
+                maxlength="500"
+                placeholder="Décrivez les responsabilités associées à ce rôle."
+                [(ngModel)]="form.description"
+              ></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="role-form-section">
+          <div class="role-section-heading">
+            <span class="section-number">02</span>
+            <div>
+              <h3>Permissions</h3>
+              <p>Choisissez les actions que les membres de ce rôle peuvent effectuer.</p>
+            </div>
+          </div>
+          <div class="permission-groups">
+            @for (group of permissions; track group.name) {
+              <fieldset class="permission-group">
+                <legend>{{ group.name }}</legend>
+                @for (permission of group.permissions; track permission.code) {
+                  <label class="permission-option">
+                    <input
+                      type="checkbox"
+                      [checked]="hasPermission(permission.code)"
+                      (change)="togglePermission(permission.code, $any($event.target).checked)"
+                    />
+                    <span class="permission-check" aria-hidden="true">
+                      <svg viewBox="0 0 16 16"><path d="m3 8 3 3 7-7" /></svg>
+                    </span>
+                    <span class="permission-copy">
+                      <strong>{{ permission.label }}</strong>
+                      <code>{{ permission.code }}</code>
+                    </span>
+                  </label>
+                }
+              </fieldset>
+            }
+          </div>
+        </section>
+
+        <section class="role-form-section">
+          <div class="role-section-heading">
+            <span class="section-number">03</span>
+            <div>
+              <h3>Périmètres documentaires</h3>
+              <p>Délimitez les documents accessibles à ce rôle.</p>
+            </div>
+          </div>
+          <div class="document-scope-options">
+            @for (scope of documentScopeOptions; track scope.code) {
+              <label
+                class="document-scope-option"
+                [class.document-scope-selected]="hasScope(scope.code)"
+              >
+                <input
+                  type="checkbox"
+                  [checked]="hasScope(scope.code)"
+                  (change)="toggleScope(scope.code, $any($event.target).checked)"
+                />
+                <span class="scope-check" aria-hidden="true">
+                  <svg viewBox="0 0 16 16"><path d="m3 8 3 3 7-7" /></svg>
+                </span>
+                <span
+                  ><strong>{{ scope.label }}</strong
+                  ><small>{{ scope.description }}</small></span
+                >
+              </label>
+            }
+          </div>
+          <p class="scope-notice">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 11v5m0-8h.01" />
+            </svg>
+            Les périmètres sont enregistrés avec le rôle. Leur filtrage effectif dépend de la
+            disponibilité des espaces et documents dans l’API.
+          </p>
+        </section>
+      </div>
+
+      <footer class="role-dialog-footer">
+        <button
+          class="role-button role-button-secondary"
+          type="button"
+          [disabled]="saving()"
+          (click)="closeForm()"
+        >
+          Annuler
+        </button>
+        <button
+          class="role-button role-button-primary"
+          type="button"
+          [disabled]="saving()"
+          (click)="save()"
+        >
+          @if (saving()) {
+            Enregistrement…
+          } @else {
+            {{ editing() ? 'Enregistrer les modifications' : 'Créer le rôle' }}
+          }
+        </button>
+      </footer>
+    </section>
+  </div>
+}

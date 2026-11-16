@@ -65,6 +65,8 @@ export class UserList {
   readonly schoolFilter = signal('');
 
   readonly formOpen = signal(false);
+  readonly showAdminPassword = signal(false);
+  readonly showAdminPasswordConfirm = signal(false);
   readonly editing = signal<ManagedUser | null>(null);
   readonly statusTarget = signal<ManagedUser | null>(null);
   readonly deleteTarget = signal<ManagedUser | null>(null);
@@ -193,6 +195,8 @@ export class UserList {
   openCreate(): void {
     this.editing.set(null);
     this.formError.set(null);
+    this.showAdminPassword.set(false);
+    this.showAdminPasswordConfirm.set(false);
     this.form = {
       email: '',
       firstName: '',
@@ -211,6 +215,8 @@ export class UserList {
   openEdit(user: ManagedUser): void {
     this.editing.set(user);
     this.formError.set(null);
+    this.showAdminPassword.set(false);
+    this.showAdminPasswordConfirm.set(false);
     this.form = {
       email: user.email,
       firstName: user.firstName,
@@ -228,6 +234,16 @@ export class UserList {
     this.formOpen.set(false);
     this.editing.set(null);
     this.formError.set(null);
+    this.showAdminPassword.set(false);
+    this.showAdminPasswordConfirm.set(false);
+  }
+
+  toggleAdminPassword(): void {
+    this.showAdminPassword.update((visible) => !visible);
+  }
+
+  toggleAdminPasswordConfirm(): void {
+    this.showAdminPasswordConfirm.update((visible) => !visible);
   }
 
   saveUser(): void {

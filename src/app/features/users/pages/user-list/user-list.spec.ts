@@ -50,4 +50,19 @@ describe('UserList', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('toggles visibility for the administrator password fields independently', () => {
+    expect(component.showAdminPassword()).toBe(false);
+    expect(component.showAdminPasswordConfirm()).toBe(false);
+
+    component.toggleAdminPassword();
+
+    expect(component.showAdminPassword()).toBe(true);
+    expect(component.showAdminPasswordConfirm()).toBe(false);
+
+    component.toggleAdminPasswordConfirm();
+
+    expect(component.showAdminPassword()).toBe(true);
+    expect(component.showAdminPasswordConfirm()).toBe(true);
+  });
 });

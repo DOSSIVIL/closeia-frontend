@@ -598,6 +598,20 @@ select:focus-visible {
   background: var(--soft);
   color: var(--muted);
 }
+.password-input-wrap {
+  display: flex;
+  min-width: 0;
+  position: relative;
+}
+.password-input-wrap input {
+  padding-right: 2.8rem;
+}
+.password-toggle {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
 .user-form small,
 .form-note {
   color: var(--muted);

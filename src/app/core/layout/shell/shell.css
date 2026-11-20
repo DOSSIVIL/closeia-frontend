@@ -4,155 +4,225 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 @theme inline {
-    --color-canvas: var(--canvas);
-    --color-surface: var(--surface);
-    --color-raised: var(--raised);
-    --color-line: var(--line);
-    --color-ink: var(--ink);
-    --color-muted: var(--muted);
-    --color-brand: var(--brand);
-    --color-brand-soft: var(--brand-soft);
-    --color-brand-ink: var(--brand-ink);
-    --color-leaf: var(--leaf);
-    --color-leaf-ink: var(--leaf-ink);
-    --color-sand: var(--sand);
-    --color-sand-ink: var(--sand-ink);
-    --color-coral: var(--coral);
-    --color-nav: var(--nav);
-    --color-nav-ink: var(--nav-ink);
-    --color-nav-muted: var(--nav-muted);
-    --color-nav-active: var(--nav-active);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-leaf: var(--leaf);
+  --color-leaf-ink: var(--leaf-ink);
+  --color-sand: var(--sand);
+  --color-sand-ink: var(--sand-ink);
+  --color-coral: var(--coral);
+  --color-nav: var(--nav);
+  --color-nav-ink: var(--nav-ink);
+  --color-nav-muted: var(--nav-muted);
+  --color-nav-active: var(--nav-active);
 }
-
 
 /* Mode clair */
 
 .shell {
-    color-scheme: light;
-    --canvas: #EEF2FB;
-    --surface: #FFFFFF;
-    --raised: #F3F6FD;
-    --line: #E2E8F5;
-    --ink: #0F1B3D;
-    --muted: #6B7A99;
-    --brand: #1D5FE0;
-    --brand-soft: color-mix(in oklab, #1D5FE0 10%, white);
-    --brand-ink: #1D5FE0;
-    --leaf: #22C55E;
-    --leaf-ink: #15803D;
-    --sand: #F59E0B;
-    --sand-ink: #B45309;
-    --coral: #EF4444;
-    /* Barre latérale : bleu nuit, identique dans les deux modes */
-    --nav: #0B1D51;
-    --nav-ink: #C4D2F4;
-    --nav-muted: #8EA3D6;
-    --nav-active: #1D5FE0;
+  color-scheme: light;
+  --canvas: #f9fafb;
+  --surface: #ffffff;
+  --raised: #f9fafb;
+  --line: #e5e7eb;
+  --ink: #2c3e50;
+  --muted: #6b7c8f;
+  --brand: #93c5fd;
+  --brand-soft: color-mix(in oklab, #93c5fd 18%, white);
+  --brand-ink: #315d82;
+  --leaf: #99d8c9;
+  --leaf-ink: #28675a;
+  --sand: #d6bfa3;
+  --sand-ink: #72583b;
+  --coral: #e4574c;
+  --nav: #e5e7eb;
+  --nav-ink: #2c3e50;
+  --nav-muted: #6b7c8f;
+  --nav-active: #1d5fe0;
+  --nav-active-ink: #ffffff;
 }
-
 
 /* Mode sombre */
 
 .shell.dark {
-    color-scheme: dark;
-    --canvas: #060C1F;
-    --surface: #0C1530;
-    --raised: #111C3D;
-    --line: #1B2A52;
-    --ink: #E8EDFB;
-    --muted: #8FA0C8;
-    --brand: #4D8DFF;
-    --brand-soft: color-mix(in oklab, #4D8DFF 16%, #0C1530);
-    --brand-ink: #8DB6FF;
-    --leaf-ink: #4ADE80;
-    --sand-ink: #FBBF24;
-    --nav: #08143F;
+  color-scheme: dark;
+  --canvas: #060c1f;
+  --surface: #0c1530;
+  --raised: #111c3d;
+  --line: #1b2a52;
+  --ink: #e8edfb;
+  --muted: #8fa0c8;
+  --brand: #4d8dff;
+  --brand-soft: color-mix(in oklab, #4d8dff 16%, #0c1530);
+  --brand-ink: #8db6ff;
+  --leaf-ink: #4ade80;
+  --sand-ink: #fbbf24;
+  --nav: #08143f;
+  --nav-ink: #c4d2f4;
+  --nav-muted: #8ea3d6;
+  --nav-active: #1d5fe0;
+  --nav-active-ink: #ffffff;
 }
 
 .shell :focus-visible:where(:not(input)) {
-    outline: 2px solid var(--brand);
-    outline-offset: 2px;
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 
 .shell .nav-link:focus-visible {
-    outline-color: #fff;
+  outline-color: #fff;
 }
 
+.shell:not(.dark) #sidebar .sidebar-brand > span {
+  color: #000;
+}
+
+.shell:not(.dark) #sidebar .sidebar-toggle {
+  border-color: var(--line);
+  background-color: rgb(255 255 255 / 0.65);
+  color: var(--ink);
+}
+
+.shell:not(.dark) #sidebar .sidebar-toggle:hover {
+  background-color: var(--surface);
+}
+
+.shell:not(.dark) #sidebar .sidebar-close:hover {
+  color: var(--ink);
+}
+
+.shell:not(.dark) #sidebar .sidebar-divider {
+  background-color: rgb(44 62 80 / 0.2);
+  box-shadow: none;
+}
+
+.shell:not(.dark) #sidebar .sidebar-separator {
+  background-color: var(--line);
+}
+
+.shell:not(.dark) #sidebar .sidebar-soon-pill {
+  background-color: var(--line);
+  color: var(--muted);
+}
+
+.shell:not(.dark) #sidebar .nav-link:hover {
+  background-color: rgb(44 62 80 / 0.08);
+  color: var(--ink);
+}
+
+.shell:not(.dark) #sidebar .sidebar-wave--blue {
+  fill: #93c5fd;
+}
+
+.shell:not(.dark) #sidebar .sidebar-wave--mint {
+  fill: #99d8c9;
+}
+
+.shell:not(.dark) #sidebar .sidebar-wave--sand {
+  fill: #d6bfa3;
+}
+
+.shell.dark #sidebar .sidebar-wave--blue {
+  fill: #1e4fd8;
+  fill-opacity: 0.55;
+}
+
+.shell.dark #sidebar .sidebar-wave--mint {
+  fill: #2f6bf5;
+  fill-opacity: 0.7;
+}
+
+.shell.dark #sidebar .sidebar-wave--sand {
+  fill: #5b6cff;
+  fill-opacity: 0.85;
+}
 
 /* Composants du shell. Dans « components », les classes Tailwind (utilities) gardent la priorité. */
 
 @layer components {
-    .nav-link {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.7rem 1rem;
-        border-radius: 0.875rem;
-        font-size: 14.5px;
-        font-weight: 500;
-        color: var(--nav-ink);
-        transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 1rem;
+    border-radius: 0.875rem;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--nav-ink);
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .nav-link:hover {
+    background-color: rgb(255 255 255 / 0.08);
+    color: #fff;
+  }
+  .nav-link.is-active,
+  .nav-link.is-active:hover {
+    background-color: var(--nav-active);
+    color: var(--nav-active-ink);
+    box-shadow: 0 8px 20px -8px rgb(29 95 224 / 0.85);
+  }
+  .nav-link[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  .nav-link[aria-disabled='true']:hover {
+    background-color: transparent;
+    color: var(--nav-ink);
+  }
+  /* Barre latérale réduite : grand écran seulement (le tiroir mobile reste complet) */
+  @media (min-width: 1024px) {
+    .nav-link--compact {
+      justify-content: center;
+      padding-inline: 0;
     }
-    .nav-link:hover {
-        background-color: rgb(255 255 255 / 0.08);
-        color: #fff;
+    .nav-label--hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
     }
-    .nav-link.is-active,
-    .nav-link.is-active:hover {
-        background-color: var(--nav-active);
-        color: #fff;
-        box-shadow: 0 8px 20px -8px rgb(29 95 224 / 0.85);
-    }
-    .nav-link[aria-disabled='true'] {
-        cursor: not-allowed;
-        opacity: 0.5;
-    }
-    .nav-link[aria-disabled='true']:hover {
-        background-color: transparent;
-        color: var(--nav-ink);
-    }
-    /* Barre latérale réduite : grand écran seulement (le tiroir mobile reste complet) */
-    @media (min-width: 1024px) {
-        .nav-link--compact {
-            justify-content: center;
-            padding-inline: 0;
-        }
-        .nav-label--hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-            clip: rect(0 0 0 0);
-            white-space: nowrap;
-        }
-    }
-    .icon-btn {
-        display: grid;
-        place-items: center;
-        width: 2.75rem;
-        height: 2.75rem;
-        border-radius: 9999px;
-        color: var(--muted);
-        transition: background-color 0.15s ease, color 0.15s ease;
-    }
-    .icon-btn:hover {
-        background-color: var(--raised);
-        color: var(--ink);
-    }
+  }
+  .icon-btn {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    color: var(--muted);
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .icon-btn:hover {
+    background-color: var(--raised);
+    color: var(--ink);
+  }
 }
 
 .pop-in {
-    animation: popIn 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-    transform-origin: top right;
+  animation: popIn 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transform-origin: top right;
 }
 
 @keyframes popIn {
-    from {
-        opacity: 0;
-        transform: translateY(-4px) scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: none;
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }

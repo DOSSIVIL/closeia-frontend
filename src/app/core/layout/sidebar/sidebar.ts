@@ -11,7 +11,11 @@ import { ShellState } from '../shell-state';
   imports: [RouterLink, RouterLinkActive, TranslocoPipe, Icon],
   template: `
     @if (state.drawerOpen()) {
-      <div class="fixed inset-0 z-40 bg-black/50 lg:hidden" (click)="state.closeDrawer()" aria-hidden="true"></div>
+      <div
+        class="fixed inset-0 z-40 bg-black/50 lg:hidden"
+        (click)="state.closeDrawer()"
+        aria-hidden="true"
+      ></div>
     }
 
     <aside
@@ -21,25 +25,35 @@ import { ShellState } from '../shell-state';
       [attr.aria-label]="'shell.nav.label' | transloco"
       [attr.inert]="inert() ? '' : null"
     >
-
       <!-- Marque et contrôle de réduction -->
-      <div class="flex h-[88px] shrink-0 items-center justify-between gap-2 px-3">
-        <a routerLink="/dashboard" class="flex min-w-0 items-center gap-2.5 rounded-lg" aria-label="CloseIA">
+      <div
+        class="flex h-[88px] shrink-0 items-center justify-between gap-2 px-3"
+        [class.lg:justify-center]="state.collapsed()"
+      >
+        <a
+          routerLink="/dashboard"
+          class="flex min-w-0 items-center gap-2.5 rounded-lg"
+          [class.lg:hidden]="state.collapsed()"
+          aria-label="CloseIA"
+        >
           <img
             src="logo.png"
             alt=""
             width="40"
             height="40"
             class="block h-10 w-10 shrink-0 object-contain"
-            [class]="state.collapsed() ? 'lg:h-8 lg:w-8' : ''"
+            [class.lg:hidden]="state.collapsed()"
           />
-          <span class="truncate text-lg font-bold tracking-tight text-white" [class]="state.collapsed() ? 'lg:hidden' : ''">
+          <span
+            class="sidebar-brand truncate text-lg font-bold tracking-tight text-white"
+            [class]="state.collapsed() ? 'lg:hidden' : ''"
+          >
             CloseIA
           </span>
         </a>
         <button
           type="button"
-          class="hidden h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/25 bg-white/10 text-white shadow-sm transition-colors hover:bg-white/20 lg:grid"
+          class="sidebar-toggle hidden h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/25 bg-white/10 text-white shadow-sm transition-colors hover:bg-white/20 lg:grid"
           (click)="state.toggleSidebar()"
           [attr.aria-label]="'shell.menu.toggle' | transloco"
           [attr.aria-expanded]="!state.collapsed()"
@@ -61,7 +75,7 @@ import { ShellState } from '../shell-state';
         </button>
         <button
           type="button"
-          class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-nav-ink transition-colors hover:bg-white/10 hover:text-white lg:hidden"
+          class="sidebar-close grid h-9 w-9 shrink-0 place-items-center rounded-full text-nav-ink transition-colors hover:bg-white/10 hover:text-white lg:hidden"
           (click)="state.closeDrawer()"
           [attr.aria-label]="'shell.menu.close' | transloco"
         >
@@ -69,14 +83,18 @@ import { ShellState } from '../shell-state';
         </button>
       </div>
 
-      <div role="separator" aria-orientation="horizontal" class="mx-4 h-0.5 shrink-0 rounded-full bg-white/40 shadow-[0_0_8px_rgba(255,255,255,0.18)]"></div>
+      <div
+        role="separator"
+        aria-orientation="horizontal"
+        class="sidebar-divider mx-4 h-0.5 shrink-0 rounded-full bg-white/40 shadow-[0_0_8px_rgba(255,255,255,0.18)]"
+      ></div>
 
       <!-- Navigation -->
       <nav class="flex-1 overflow-y-auto px-4 pt-2 pb-[130px]">
         <ul class="space-y-1.5">
           @for (item of items(); track item.path) {
             @if (item.separatorBefore) {
-              <li role="separator" class="mx-2 my-3 h-px bg-white/10"></li>
+              <li role="separator" class="sidebar-separator mx-2 my-3 h-px bg-white/10"></li>
             }
             <li>
               @if (item.soon) {
@@ -87,9 +105,11 @@ import { ShellState } from '../shell-state';
                   [attr.title]="'shell.nav.soon' | transloco"
                 >
                   <app-icon [name]="item.icon" />
-                  <span class="nav-label truncate" [class.nav-label--hidden]="state.collapsed()">{{ item.labelKey | transloco }}</span>
+                  <span class="nav-label truncate" [class.nav-label--hidden]="state.collapsed()">{{
+                    item.labelKey | transloco
+                  }}</span>
                   <span
-                    class="ml-auto rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-nav-muted uppercase"
+                    class="sidebar-soon-pill ml-auto rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-nav-muted uppercase"
                     [class]="state.collapsed() ? 'lg:hidden' : ''"
                   >
                     {{ 'shell.nav.soon' | transloco }}
@@ -105,7 +125,9 @@ import { ShellState } from '../shell-state';
                   [attr.title]="state.collapsed() ? (item.labelKey | transloco) : null"
                 >
                   <app-icon [name]="item.icon" />
-                  <span class="nav-label truncate" [class.nav-label--hidden]="state.collapsed()">{{ item.labelKey | transloco }}</span>
+                  <span class="nav-label truncate" [class.nav-label--hidden]="state.collapsed()">{{
+                    item.labelKey | transloco
+                  }}</span>
                 </a>
               }
             </li>
@@ -120,9 +142,21 @@ import { ShellState } from '../shell-state';
         preserveAspectRatio="none"
         aria-hidden="true"
       >
-        <path d="M0 58C38 34 84 34 124 54s84 36 140 4V110H0Z" fill="#1E4FD8" fill-opacity="0.55" />
-        <path d="M0 76C46 54 92 58 138 76s78 22 126-4V110H0Z" fill="#2F6BF5" fill-opacity="0.7" />
-        <path d="M0 92C50 80 98 84 142 94s80 12 122-6V110H0Z" fill="#5B6CFF" fill-opacity="0.85" />
+        <path
+          class="sidebar-wave--blue"
+          d="M0 58C38 34 84 34 124 54s84 36 140 4V110H0Z"
+          fill="#93C5FD"
+        />
+        <path
+          class="sidebar-wave--mint"
+          d="M0 76C46 54 92 58 138 76s78 22 126-4V110H0Z"
+          fill="#99D8C9"
+        />
+        <path
+          class="sidebar-wave--sand"
+          d="M0 92C50 80 98 84 142 94s80 12 122-6V110H0Z"
+          fill="#D6BFA3"
+        />
       </svg>
     </aside>
   `,
@@ -132,7 +166,9 @@ export class Sidebar {
   private readonly auth = inject(Auth);
 
   /** Pages disponibles et autorisées pour l'utilisateur connecté. */
-  protected readonly items = computed(() => NAV_ITEMS.filter((i) => !i.soon && this.auth.hasPermission(i.permission)));
+  protected readonly items = computed(() =>
+    NAV_ITEMS.filter((i) => !i.soon && this.auth.hasPermission(i.permission)),
+  );
 
   protected readonly asideClass = computed(() => {
     const width = this.state.collapsed() ? 'w-[264px] lg:w-[84px]' : 'w-[264px]';

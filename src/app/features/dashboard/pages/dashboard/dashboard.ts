@@ -1,33 +1,10 @@
-import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-
-interface StatCard {
-  label: string;
-  value: number;
-  change: number;
-  trend: 'up' | 'down';
-  icon: string;
-  color: 'blue' | 'sage' | 'sand' | 'coral';
-}
-
-interface School {
-  id: number;
-  name: string;
-  users: number;
-  documents: number;
-  status: 'active' | 'inactive';
-  createdAt: string;
-}
-
-interface Activity {
-  id: number;
-  user: string;
-  action: string;
-  target: string;
-  time: string;
-  type: 'document' | 'user' | 'school' | 'conversation';
-}
+import { DashboardSummary } from '../../models/dashboard.model';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -37,57 +14,153 @@ interface Activity {
   styleUrls: ['./dashboard.css'],
 })
 export class Dashboard {
-  // Stats principales
-  stats = signal<StatCard[]>([
-    { label: 'Écoles actives', value: 12, change: 8.5, trend: 'up', icon: 'school', color: 'blue' },
-    { label: 'Utilisateurs', value: 2847, change: 12.3, trend: 'up', icon: 'users', color: 'sage' },
-    { label: 'Documents', value: 15420, change: 4.2, trend: 'up', icon: 'document', color: 'sand' },
-    { label: 'Conversations', value: 8934, change: -2.1, trend: 'down', icon: 'chat', color: 'coral' },
-  ]);
+  private readonly api = inject(DashboardService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  // Écoles récentes
-  schools = signal<School[]>([
-    { id: 1, name: 'École Saint Jean', users: 450, documents: 3200, status: 'active', createdAt: '2026-01-15' },
-    { id: 2, name: 'Collège du Sacré-Cœur', users: 320, documents: 2100, status: 'active', createdAt: '2026-02-03' },
-    { id: 3, name: 'Lycée Technique', users: 280, documents: 1800, status: 'active', createdAt: '2026-02-20' },
-    { id: 4, name: 'Institut Supérieur', users: 150, documents: 950, status: 'inactive', createdAt: '2026-03-10' },
-  ]);
+  readonly summary = signal<DashboardSummary | null>(null);
+  readonly loading = signal(true);
+  readonly exporting = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly exportError = signal<string | null>(null);
 
-  // Activités récentes
-  activities = signal<Activity[]>([
-    { id: 1, user: 'Marie Dupont', action: 'a importé', target: 'Guide_Pedagogique_2026.pdf', time: 'Il y a 5 min', type: 'document' },
-    { id: 2, user: 'Admin Système', action: "a créé l'école", target: 'Collège Saint Marc', time: 'Il y a 12 min', type: 'school' },
-    { id: 3, user: 'Jean Kabongo', action: 'a rejoint', target: 'École Saint Jean', time: 'Il y a 25 min', type: 'user' },
-    { id: 4, user: 'Sophie Martin', action: 'a démarré une conversation', target: "Procédure d'inscription", time: 'Il y a 1 h', type: 'conversation' },
-    { id: 5, user: 'Pierre Nguema', action: 'a mis à jour', target: 'Règlement_Intérieur_v3.pdf', time: 'Il y a 2 h', type: 'document' },
-  ]);
+  readonly metrics = computed(() => {
+    const data = this.summary();
+    if (!data) return [];
+    return [
+      {
+        label: 'Établissements',
+        value: data.schools.total,
+        detail: `${data.schools.active} actifs · ${data.schools.inactive} inactifs`,
+        color: 'blue',
+        icon: 'school',
+      },
+      {
+        label: 'Utilisateurs',
+        value: data.users.total,
+        detail: 'Comptes enregistrés',
+        color: 'sand',
+        icon: 'users',
+      },
+      {
+        label: 'Utilisateurs actifs',
+        value: data.users.active,
+        detail: 'Comptes au statut actif',
+        color: 'sage',
+        icon: 'active',
+      },
+      {
+        label: 'Invitations en attente',
+        value: data.users.invited,
+        detail: 'Comptes au statut invité',
+        color: 'coral',
+        icon: 'invite',
+      },
+    ];
+  });
 
-  // Données pour le graphique (7 derniers jours)
-  chartData = signal<number[]>([42, 58, 35, 67, 89, 72, 95]);
-  chartLabels = signal<string[]>(['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']);
+  readonly statusBreakdown = computed(() => {
+    const users = this.summary()?.users;
+    if (!users) return [];
+    return [
+      { label: 'Actifs', value: users.active, color: 'var(--dashboard-sage)' },
+      { label: 'Invités', value: users.invited, color: 'var(--dashboard-sand)' },
+      { label: 'Suspendus', value: users.suspended, color: 'var(--dashboard-coral)' },
+    ];
+  });
 
-  // Calculs
-  maxChartValue = computed(() => Math.max(...this.chartData()));
-  totalUsers = computed(() => this.schools().reduce((sum, s) => sum + s.users, 0));
-  activeSchools = computed(() => this.schools().filter(s => s.status === 'active').length);
+  readonly donutStyle = computed(() => {
+    const parts = this.statusBreakdown();
+    const total = parts.reduce((sum, item) => sum + item.value, 0);
+    if (!total) return 'conic-gradient(var(--dashboard-chart-empty) 0% 100%)';
 
-  getColorClasses(color: string): { bg: string; text: string; gradient: string } {
-    const colors: Record<string, { bg: string; text: string; gradient: string }> = {
-      blue: { bg: 'bg-[#93C5FD]/20', text: 'text-[#6BA3E0]', gradient: 'from-[#93C5FD] to-[#6BA3E0]' },
-      sage: { bg: 'bg-[#99D8C9]/20', text: 'text-[#6BAE9E]', gradient: 'from-[#99D8C9] to-[#6BAE9E]' },
-      sand: { bg: 'bg-[#D6BFA3]/20', text: 'text-[#B89B7A]', gradient: 'from-[#D6BFA3] to-[#B89B7A]' },
-      coral: { bg: 'bg-[#E4574C]/20', text: 'text-[#C94A40]', gradient: 'from-[#E4574C] to-[#C94A40]' },
-    };
-    return colors[color] || colors['blue'];
+    let start = 0;
+    const slices = parts.map((item) => {
+      const end = start + (item.value / total) * 100;
+      const slice = `${item.color} ${start}% ${end}%`;
+      start = end;
+      return slice;
+    });
+    return `conic-gradient(${slices.join(', ')})`;
+  });
+
+  readonly chartCoordinates = computed(() => {
+    const values = this.summary()?.users.monthlyRegistrations ?? [];
+    const max = Math.max(1, ...values.map((item) => item.count));
+    return values.map((item, index) => ({
+      ...item,
+      x: values.length < 2 ? 400 : 36 + (index * 728) / (values.length - 1),
+      y: 190 - (item.count / max) * 156,
+    }));
+  });
+
+  readonly chartLine = computed(() =>
+    this.chartCoordinates()
+      .map((point) => `${point.x},${point.y}`)
+      .join(' '),
+  );
+
+  readonly chartArea = computed(() => {
+    const points = this.chartCoordinates();
+    if (!points.length) return '';
+    return `M ${points[0].x},190 L ${points.map((point) => `${point.x},${point.y}`).join(' L ')} L ${points[points.length - 1].x},190 Z`;
+  });
+
+  constructor() {
+    this.refresh();
   }
 
-  getActivityIcon(type: string): string {
-    const icons: Record<string, string> = {
-      document: '📄',
-      user: '👤',
-      school: '🏫',
-      conversation: '💬',
-    };
-    return icons[type] || '📌';
+  refresh(): void {
+    this.loading.set(true);
+    this.error.set(null);
+    this.api
+      .getSummary()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (summary) => {
+          this.summary.set(summary);
+          this.loading.set(false);
+        },
+        error: (error: unknown) => {
+          this.error.set(this.errorMessage(error));
+          this.loading.set(false);
+        },
+      });
+  }
+
+  exportExcel(): void {
+    this.exporting.set(true);
+    this.exportError.set(null);
+    this.api
+      .exportExcel()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (file) => {
+          const url = URL.createObjectURL(file);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'tableau-de-bord-closeia.xlsx';
+          link.click();
+          window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+          this.exporting.set(false);
+        },
+        error: (error: unknown) => {
+          this.exportError.set(this.errorMessage(error));
+          this.exporting.set(false);
+        },
+      });
+  }
+
+  monthLabel(month: string): string {
+    const date = new Date(`${month}-01T00:00:00`);
+    return new Intl.DateTimeFormat('fr-FR', { month: 'short' }).format(date);
+  }
+
+  private errorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      return error.status === 0
+        ? 'Le serveur est injoignable. Vérifiez votre connexion puis réessayez.'
+        : (error.error?.message ?? 'Une erreur est survenue. Veuillez réessayer.');
+    }
+    return 'Une erreur inattendue est survenue.';
   }
 }

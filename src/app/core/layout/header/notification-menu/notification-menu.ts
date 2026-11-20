@@ -27,7 +27,9 @@ import { ShellState } from '../../shell-state';
       >
         <app-icon name="bell" />
         @if (notifications.unreadCount() > 0) {
-          <span class="absolute top-2 right-2.5 h-2.5 w-2.5 rounded-full bg-coral ring-2 ring-surface"></span>
+          <span
+            class="absolute top-2 right-2.5 h-2.5 w-2.5 rounded-full bg-coral ring-2 ring-surface"
+          ></span>
         }
       </button>
 
@@ -40,9 +42,13 @@ import { ShellState } from '../../shell-state';
           <!-- En-tête -->
           <div class="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
             <div class="flex items-center gap-2">
-              <h2 class="text-[15px] font-semibold text-ink">{{ 'shell.notifications.title' | transloco }}</h2>
+              <h2 class="text-[15px] font-semibold text-ink">
+                {{ 'shell.notifications.title' | transloco }}
+              </h2>
               @if (notifications.unreadCount() > 0) {
-                <span class="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand-ink">
+                <span
+                  class="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand-ink"
+                >
                   {{ notifications.unreadCount() }}
                 </span>
               }
@@ -57,7 +63,27 @@ import { ShellState } from '../../shell-state';
             </button>
           </div>
 
-          @if (notifications.items().length > 0) {
+          @if (notifications.error()) {
+            <div
+              class="flex items-center justify-between gap-3 border-b border-line bg-coral/10 px-4 py-3 text-[13px] text-coral"
+              role="alert"
+            >
+              <span>{{ notifications.error() }}</span>
+              <button
+                type="button"
+                class="shrink-0 font-semibold underline"
+                (click)="notifications.load()"
+              >
+                Réessayer
+              </button>
+            </div>
+          }
+
+          @if (notifications.loading() && notifications.items().length === 0) {
+            <div class="px-4 py-8 text-center text-[13px] text-muted" role="status">
+              Chargement des notifications…
+            </div>
+          } @else if (notifications.items().length > 0) {
             <ul class="max-h-[min(60vh,400px)] divide-y divide-line overflow-y-auto">
               @for (n of notifications.items(); track n.id) {
                 <li>
@@ -67,18 +93,29 @@ import { ShellState } from '../../shell-state';
                     [class]="n.read ? '' : 'bg-brand-soft/40'"
                     (click)="notifications.markRead(n.id)"
                   >
-                    <span class="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl" [class]="tone[n.kind].box">
+                    <span
+                      class="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl"
+                      [class]="tone[n.kind].box"
+                    >
                       <app-icon [name]="tone[n.kind].icon" [size]="18" />
                     </span>
                     <span class="min-w-0 flex-1">
                       <span class="flex items-center gap-2">
-                        <span class="truncate text-[14px] text-ink" [class]="n.read ? 'font-medium' : 'font-semibold'">{{ n.title }}</span>
+                        <span
+                          class="truncate text-[14px] text-ink"
+                          [class]="n.read ? 'font-medium' : 'font-semibold'"
+                          >{{ n.title }}</span
+                        >
                         @if (!n.read) {
                           <span class="h-2 w-2 shrink-0 rounded-full bg-coral"></span>
                         }
                       </span>
-                      <span class="mt-0.5 line-clamp-2 block text-[13px] leading-snug text-muted">{{ n.message }}</span>
-                      <span class="mt-1 block text-[12px] text-muted/80">{{ n.createdAt | timeAgo: lang.current() }}</span>
+                      <span class="mt-0.5 line-clamp-2 block text-[13px] leading-snug text-muted">{{
+                        n.message
+                      }}</span>
+                      <span class="mt-1 block text-[12px] text-muted/80">{{
+                        n.createdAt | timeAgo: lang.current()
+                      }}</span>
                     </span>
                   </button>
                 </li>
@@ -93,13 +130,17 @@ import { ShellState } from '../../shell-state';
                 {{ 'shell.notifications.clear' | transloco }}
               </button>
             </div>
-          } @else {
+          } @else if (!notifications.error()) {
             <div class="flex flex-col items-center px-6 py-12 text-center">
               <span class="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-raised text-muted">
                 <app-icon name="bellOff" [size]="22" />
               </span>
-              <p class="text-[14px] font-semibold text-ink">{{ 'shell.notifications.empty' | transloco }}</p>
-              <p class="mt-1 text-[13px] text-muted">{{ 'shell.notifications.emptyHint' | transloco }}</p>
+              <p class="text-[14px] font-semibold text-ink">
+                {{ 'shell.notifications.empty' | transloco }}
+              </p>
+              <p class="mt-1 text-[13px] text-muted">
+                {{ 'shell.notifications.emptyHint' | transloco }}
+              </p>
             </div>
           }
         </div>
@@ -129,7 +170,9 @@ export class NotificationMenu {
   };
 
   protected toggle(): void {
+    const wasOpen = this.open();
     this.state.toggleMenu('notifications');
+    if (!wasOpen) this.notifications.load();
   }
 
   protected close(): void {
@@ -139,6 +182,7 @@ export class NotificationMenu {
   }
 
   protected onDocumentClick(event: MouseEvent): void {
-    if (this.open() && !this.host.nativeElement.contains(event.target as Node)) this.state.closeMenus();
+    if (this.open() && !this.host.nativeElement.contains(event.target as Node))
+      this.state.closeMenus();
   }
 }
